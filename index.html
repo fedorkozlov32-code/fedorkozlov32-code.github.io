@@ -104,11 +104,26 @@
 
         /* Слоты времени - Medium (500) */
         /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ СЛОТОВ ВРЕМЕНИ --- */
+        /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ СЕТКИ ВРЕМЕНИ --- */
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            
+            /* Восстановили нормальные отступы между кнопками (12px),
+               чтобы было как на скрине */
+            gap: 12px; 
+        }
+
+        /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ КНОПОК --- */
         .time-slot {
             background: var(--disabled-bg);
-            /* Уменьшили вертикальный padding с 14px до 10px, 
-               чтобы текст не склеивался */
-            padding: 10px 0; 
+            
+            /* Восстановили вертикальный padding (14px),
+               чтобы кнопки были высокими, как на скрине */
+            /* Горизонтальный padding уменьшили до 5px, 
+               чтобы текст не упирался в края */
+            padding: 14px 5px; 
+            
             border-radius: 18px;
             font-size: 13px;
             color: var(--inactive-text);
@@ -118,11 +133,13 @@
             font-weight: 500;
             transition: 0.2s;
             
-            /* Добавляем, чтобы текст точно не вылезал */
+            /* Гарантируем, что текст не склеится, даже если
+               экран очень узкий */
             overflow: hidden; 
-            text-overflow: ellipsis; 
+            text-overflow: clip; 
             white-space: nowrap; 
         }
+        /* ------------------------------------------- */
         /* ------------------------------------------- */
 
         .time-slot.selected { background: var(--primary-color); color: white; }
