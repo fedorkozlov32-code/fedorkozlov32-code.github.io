@@ -265,35 +265,96 @@
         }
     }
 
-    function renderTimeSlots() {
-        const container = document.getElementById('time-container');
-        container.innerHTML = '';
-        selectedSlots = [];
-        document.getElementById('btn-finish').classList.remove('active');
+    // Замени существующую функцию renderTimeSlots и добавь переменную
+let selectedSlots = []; 
 
-        for (let i = 0; i < 24; i++) {
-            const start = i < 10 ? `0${i}:00` : `${i}:00`;
-            const end = (i + 1) < 10 ? `0${i+1}:00` : (i+1 === 24 ? '00:00' : `${i+1}:00`);
-            const timeStr = `${start} - ${end}`;
-            
-            const btn = document.createElement('button');
-            btn.className = 'time-slot';
-            btn.innerText = timeStr;
-            btn.onclick = () => {
-                if (selectedSlots.includes(timeStr)) {
-                    selectedSlots = selectedSlots.filter(s => s !== timeStr);
-                    btn.classList.remove('selected');
+function renderTimeSlots() {
+    const container = document.getElementById('time-container');
+    container.innerHTML = '';
+    selectedSlots = [];
+    document.getElementById('btn-finish').classList.remove('active');
+
+    // Генерируем 29 слотов (24 часа текущего дня + 5 часов следующего)
+    for (let i = 0; i < 29; i++) {
+        const hour = i % 24;
+        const nextHour = (i + 1) % 24;
+        
+        const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
+        const end = nextHour < 10 ? `0${nextHour}:00` : `${nextHour}:00`;
+        
+        // Пометка для слотов после полуночи
+        const isNextDay = i >= 24;
+        const timeStr = `${start} - ${end}${isNextDay ? ' (след. день)' : ''}`;
+        
+        const btn = document.createElement('button');
+        btn.className = 'time-slot';
+        btn.innerText = `${start} - ${end}`;
+        btn.dataset.index = i; // Сохраняем порядковый номер для проверки последовательности
+        
+        btn.onclick = function() {
+            const index = parseInt(this.dataset.index);
+
+            if (selectedSlots.length === 0) {
+                // Первый выбор
+                selectedSlots.push(index);
+                this.classList.add('selected');
+            } else {
+                const min = Math.min(...selectedSlots);
+                const max = Math.max(...selectedSlots);
+
+                if (selectedSlots.includes(index)) {
+                    // Если снимаем выделение, то только с краев
+                    if (index === min || index === max) {
+                        selectedSlots = selectedSlots.filter(s => s !== index);
+                        this.classList.remove('selected');
+                    } else {
+                        // Если кликнули в середину — сбрасываем и выбираем только этот
+                        resetSelection(index, this);
+                    }
                 } else {
-                    selectedSlots.push(timeStr);
-                    btn.classList.add('selected');
+                    // Проверка на последовательность
+                    if (index === min - 1 || index === max + 1) {
+                        selectedSlots.push(index);
+                        this.classList.add('selected');
+                    } else {
+                        // Непоследовательный выбор — сбрасываем всё
+                        resetSelection(index, this);
+                    }
                 }
-                const finishBtn = document.getElementById('btn-finish');
-                selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
-            };
-            container.appendChild(btn);
-        }
+            }
+            
+            // Активация кнопки "Далее"
+            const finishBtn = document.getElementById('btn-finish');
+            selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
+        };
+        container.appendChild(btn);
     }
+}
 
+function resetSelection(newIndex, element) {
+    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+    selectedSlots = [newIndex];
+    element.classList.add('selected');
+}
+
+// Обнови функцию отправки, чтобы n8n понимал структуру
+function sendToBot() {
+    selectedSlots.sort((a, b) => a - b);
+    const startIdx = selectedSlots[0];
+    const endIdx = selectedSlots[selectedSlots.length - 1];
+    
+    const result = {
+        date: selectedFullDate.toISOString().split('T')[0],
+        start_index: startIdx,
+        end_index: endIdx + 1,
+        total_hours: selectedSlots.length,
+        // Формируем читаемую строку для n8n
+        display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`
+    };
+    
+    tg.sendData(JSON.stringify(result));
+    tg.close();
+}
     function showStep(step) {
         if (step === 2) {
             document.getElementById('step-date').classList.add('hidden');
