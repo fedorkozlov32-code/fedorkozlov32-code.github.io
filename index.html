@@ -300,93 +300,49 @@
         btn.innerText = `${start} - ${end}`;
         btn.dataset.index = i;
         
-        btn.onclick = function() {
-            const index = parseInt(this.dataset.index);
-            
-            // --- НОВАЯ ПРОВЕРКА ДЛЯ СЛЕДУЮЩЕГО ДНЯ ---
-            if (index >= 24) {
-                // Проверяем, выбран ли последний слот текущего дня (23:00 - 00:00)
-                const isLateNightSelected = selectedSlots.includes(23);
-                
-                if (!isLateNightSelected) {
-                    // Если 23:00 не выбрано, выводим предупреждение или просто игнорим
-                    tg.showAlert("Слоты следующего дня доступны только при бронировании ночной смены (после 23:00)");
-                    return; // Прерываем выполнение функции
-                }
-            }
-            // ------------------------------------------
-
-            if (selectedSlots.length === 0) {
-                selectedSlots.push(index);
-                this.classList.add('selected');
-            } else {
-                const min = Math.min(...selectedSlots);
-                const max = Math.max(...selectedSlots);
-
-                if (selectedSlots.includes(index)) {
-                    // Если снимаем выделение, проверяем, не "оторвем" ли мы завтрашний день
-                    if (index === 23 && selectedSlots.some(i => i >= 24)) {
-                        tg.showAlert("Сначала отмените слоты следующего дня");
-                        return;
-                    }
-
-                    if (index === min || index === max) {
-                        selectedSlots = selectedSlots.filter(s => s !== index);
-                        this.classList.remove('selected');
-                    } else {
-                        resetSelection(index, this);
-                    }
-                } else {
-                    if (index === min - 1 || index === max + 1) {
-                        selectedSlots.push(index);
-                        this.classList.add('selected');
-                    } else {
-                        resetSelection(index, this);
-                    }
-                }
-            }
-            
+        btn.onclick = function() {// ... (внутри цикла for)
             const finishBtn = document.getElementById('btn-finish');
             selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
         };
+        container.appendChild(btn);
+    } // ЗАКРЫВАЕМ ЦИКЛ FOR
+} // ЗАКРЫВАЕМ ФУНКЦИЮ renderTimeSlots
 
-    function resetSelection(newIndex, element) {
-        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-        selectedSlots = [newIndex];
-        element.classList.add('selected');
+function resetSelection(newIndex, element) {
+    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+    selectedSlots = [newIndex];
+    element.classList.add('selected');
+}
+
+function showStep(step) {
+    if (step === 2) {
+        document.getElementById('step-date').classList.add('hidden');
+        document.getElementById('step-time').classList.remove('hidden');
+        document.getElementById('selected-date-title').innerText = `${selectedFullDate.getDate()} ${monthNamesGenitive[selectedFullDate.getMonth()]} ${selectedFullDate.getFullYear()}`;
+        renderTimeSlots();
+    } else {
+        document.getElementById('step-time').classList.add('hidden');
+        document.getElementById('step-date').classList.remove('hidden');
     }
+}
 
-    function showStep(step) {
-        if (step === 2) {
-            document.getElementById('step-date').classList.add('hidden');
-            document.getElementById('step-time').classList.remove('hidden');
-            document.getElementById('selected-date-title').innerText = `${selectedFullDate.getDate()} ${monthNamesGenitive[selectedFullDate.getMonth()]} ${selectedFullDate.getFullYear()}`;
-            renderTimeSlots();
-        } else {
-            document.getElementById('step-time').classList.add('hidden');
-            document.getElementById('step-date').classList.remove('hidden');
-        }
-    }
+function changeMonth(dir) {
+    currentViewDate.setMonth(currentViewDate.getMonth() + dir);
+    renderCalendar();
+}
 
-    function changeMonth(dir) {
-        currentViewDate.setMonth(currentViewDate.getMonth() + dir);
-        renderCalendar();
-    }
+// Назначаем обработчики кликов при инициализации
+document.getElementById('btn-to-time').onclick = () => { if(selectedFullDate) showStep(2); };
+document.getElementById('btn-finish').onclick = () => { if(selectedSlots.length > 0) sendToBot(); };
 
-    document.getElementById('btn-to-time').onclick = () => { if(selectedFullDate) showStep(2); };
-    document.getElementById('btn-finish').onclick = () => { if(selectedSlots.length > 0) sendToBot(); };
-
-    async function sendToBot() {
+async function sendToBot() {
     const btn = document.getElementById('btn-finish');
-    
-    // 1. Включаем режим загрузки
     btn.classList.add('loading');
 
     selectedSlots.sort((a, b) => a - b);
     const startIdx = selectedSlots[0];
     const endIdx = selectedSlots[selectedSlots.length - 1];
     
-    // Функция для корректного форматирования даты без смещения часового пояса
     const year = selectedFullDate.getFullYear();
     const month = String(selectedFullDate.getMonth() + 1).padStart(2, '0');
     const day = String(selectedFullDate.getDate()).padStart(2, '0');
@@ -394,7 +350,7 @@
     
     const bookingData = {
         user: tg.initDataUnsafe.user,
-        date: formattedDate, // Теперь здесь всегда будет выбранный день
+        date: formattedDate,
         display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`,
         slots: selectedSlots,
         duration: selectedSlots.length,
@@ -420,12 +376,11 @@
     } catch (error) {
         tg.showAlert("Ошибка при отправке. Попробуй еще раз.");
     } finally {
-        // 2. Выключаем режим загрузки (даже если произошла ошибка)
         btn.classList.remove('loading');
     }
 }
 
-    init();
+init();
 </script>
 </body>
 </html>
