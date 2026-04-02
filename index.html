@@ -48,6 +48,40 @@
             font-size: 17px;
         }
 
+        /* Разделитель для следующего дня */
+        .night-divider {
+            grid-column: 1 / -1; /* Растягиваем на все 3 колонки */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            }            
+
+            .night-divider::before, .night-divider::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, #eee, transparent);
+            }
+            
+            /* Стиль для кнопок следующего дня */
+            .time-slot.next-day-slot {
+                background: #f0f3ff; /* Легкий голубоватый оттенок */
+                border: 1px dashed #d0d7ff; /* Пунктирная рамка */
+            }
+            
+            /* Иконка луны рядом с временем (по желанию) */
+            .time-slot.next-day-slot::after {
+                content: " 🌙";
+                font-size: 10px;
+                vertical-align: middle;
+            }
+
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
         .weekday { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-color); }
         
@@ -199,51 +233,67 @@
     }
 
     function renderTimeSlots() {
-        const container = document.getElementById('time-container');
-        container.innerHTML = '';
-        selectedSlots = [];
-        document.getElementById('btn-finish').classList.remove('active');
+    const container = document.getElementById('time-container');
+    container.innerHTML = '';
+    selectedSlots = [];
+    document.getElementById('btn-finish').classList.remove('active');
 
-        for (let i = 0; i < 29; i++) {
-            const hour = i % 24;
-            const nextHour = (i + 1) % 24;
-            const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
-            const end = nextHour < 10 ? `0${nextHour}:00` : `${nextHour}:00`;
-            
-            const btn = document.createElement('button');
-            btn.className = 'time-slot';
-            btn.innerText = `${start} - ${end}`;
-            btn.dataset.index = i;
-            
-            btn.onclick = function() {
-                const index = parseInt(this.dataset.index);
-                if (selectedSlots.length === 0) {
-                    selectedSlots.push(index);
-                    this.classList.add('selected');
-                } else {
-                    const min = Math.min(...selectedSlots);
-                    const max = Math.max(...selectedSlots);
+    // 24 часа сегодня + 6 часов завтра = 30 слотов
+    for (let i = 0; i < 30; i++) {
+        
+        // --- ДОБАВЛЯЕМ РАЗДЕЛИТЕЛЬ ПЕРЕД 00:00 ---
+        if (i === 24) {
+            const divider = document.createElement('div');
+            divider.className = 'night-divider';
+            divider.innerHTML = '<span>Следующий день</span>';
+            container.appendChild(divider);
+        }
 
-                    if (selectedSlots.includes(index)) {
-                        if (index === min || index === max) {
-                            selectedSlots = selectedSlots.filter(s => s !== index);
-                            this.classList.remove('selected');
-                        } else {
-                            resetSelection(index, this);
-                        }
-                    } else if (index === min - 1 || index === max + 1) {
-                        selectedSlots.push(index);
-                        this.classList.add('selected');
+        const hour = i % 24;
+        const nextHour = (i + 1) % 24;
+        const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
+        const end = nextHour < 10 ? `0${nextHour}:00` : `${nextHour}:00`;
+        
+        const btn = document.createElement('button');
+        btn.className = 'time-slot';
+        
+        // Если это следующий день, добавляем спец. класс
+        if (i >= 24) {
+            btn.classList.add('next-day-slot');
+        }
+
+        btn.innerText = `${start} - ${end}`;
+        btn.dataset.index = i;
+        
+        btn.onclick = function() {
+            const index = parseInt(this.dataset.index);
+            if (selectedSlots.length === 0) {
+                selectedSlots.push(index);
+                this.classList.add('selected');
+            } else {
+                const min = Math.min(...selectedSlots);
+                const max = Math.max(...selectedSlots);
+
+                if (selectedSlots.includes(index)) {
+                    if (index === min || index === max) {
+                        selectedSlots = selectedSlots.filter(s => s !== index);
+                        this.classList.remove('selected');
                     } else {
                         resetSelection(index, this);
                     }
+                } else if (index === min - 1 || index === max + 1) {
+                    selectedSlots.push(index);
+                    this.classList.add('selected');
+                } else {
+                    resetSelection(index, this);
                 }
-                const finishBtn = document.getElementById('btn-finish');
-                selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
-            };
-            container.appendChild(btn);
-        }
+            }
+            const finishBtn = document.getElementById('btn-finish');
+            selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
+        };
+        container.appendChild(btn);
     }
+}
 
     function resetSelection(newIndex, element) {
         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
