@@ -366,12 +366,19 @@
     const startIdx = selectedSlots[0];
     const endIdx = selectedSlots[selectedSlots.length - 1];
     
+    // Функция для корректного форматирования даты без смещения часового пояса
+    const year = selectedFullDate.getFullYear();
+    const month = String(selectedFullDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedFullDate.getDate()).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    
     const bookingData = {
         user: tg.initDataUnsafe.user,
-        date: selectedFullDate.toISOString().split('T')[0],
+        date: formattedDate, // Теперь здесь всегда будет выбранный день
         display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`,
         slots: selectedSlots,
-        duration: selectedSlots.length
+        duration: selectedSlots.length,
+        is_overnight: endIdx >= 24
     };
 
     const WEBHOOK_URL = 'https://n8ndex.ru/webhook-test/4b890fd5-6b71-480b-9c18-60eb4d5a9138';
