@@ -29,15 +29,7 @@
         }
 
         .container { width: 100%; max-width: 400px; }
-        
-        /* Заголовок (выбери дату) - Semi Bold (600) */
-        h1 { 
-            font-size: 42px; 
-            font-weight: 600; 
-            line-height: 1.1; 
-            margin: 20px 0 40px 0; 
-            letter-spacing: -1px;
-        }
+        h1 { font-size: 42px; font-weight: 600; line-height: 1.1; margin: 20px 0 40px 0; letter-spacing: -1px; }
 
         .card {
             background: #fff;
@@ -46,7 +38,6 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.04);
         }
 
-        /* Месяц и год - Extra Bold (800) */
         .calendar-header {
             display: flex;
             justify-content: space-between;
@@ -57,22 +48,9 @@
             font-size: 17px;
         }
 
-        .days-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-            text-align: center;
-        }
-
-        /* День недели (пн, вт) - Bold (700) */
-        .weekday { 
-            font-size: 14px; 
-            font-weight: 700; 
-            margin-bottom: 10px; 
-            color: var(--text-color);
-        }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; }
+        .weekday { font-size: 14px; font-weight: 700; margin-bottom: 10px; color: var(--text-color); }
         
-        /* Числа в календаре: активные Medium (500), неактивные Regular (400) */
         .day {
             aspect-ratio: 1;
             display: flex;
@@ -82,48 +60,18 @@
             cursor: pointer;
             font-size: 15px;
             transition: 0.2s;
-            font-weight: 500; /* По умолчанию активные */
+            font-weight: 500;
         }
 
-        .day.past { 
-            color: var(--disabled-text); 
-            cursor: default; 
-            font-weight: 400; /* Неактивные (прошедшие) */
-        }
-        
-        .day.empty {
-            font-weight: 400; /* Пустые ячейки */
-            color: var(--disabled-text);
-        }
+        .day.past { color: var(--disabled-text); cursor: default; font-weight: 400; }
+        .day.empty { font-weight: 400; color: var(--disabled-text); }
+        .day.selected { background: var(--primary-color) !important; color: white !important; font-weight: 600; }
 
-        .day.selected { 
-            background: var(--primary-color) !important; 
-            color: white !important; 
-            font-weight: 600; 
-        }
+        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 
-        /* Слоты времени - Medium (500) */
-        /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ СЛОТОВ ВРЕМЕНИ --- */
-        /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ СЕТКИ ВРЕМЕНИ --- */
-        .time-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            
-            /* Восстановили нормальные отступы между кнопками (12px),
-               чтобы было как на скрине */
-            gap: 12px; 
-        }
-
-        /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ КНОПОК --- */
         .time-slot {
             background: var(--disabled-bg);
-            
-            /* Восстановили вертикальный padding (14px),
-               чтобы кнопки были высокими, как на скрине */
-            /* Горизонтальный padding уменьшили до 5px, 
-               чтобы текст не упирался в края */
-            padding: 14px 5px; 
-            
+            padding: 14px 5px;
             border-radius: 18px;
             font-size: 13px;
             color: var(--inactive-text);
@@ -132,19 +80,13 @@
             font-family: 'Inter', sans-serif;
             font-weight: 500;
             transition: 0.2s;
-            
-            /* Гарантируем, что текст не склеится, даже если
-               экран очень узкий */
-            overflow: hidden; 
-            text-overflow: clip; 
-            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: clip;
+            white-space: nowrap;
         }
-        /* ------------------------------------------- */
-        /* ------------------------------------------- */
 
         .time-slot.selected { background: var(--primary-color); color: white; }
 
-        /* Текст на кнопке далее: активная Bold (700), неактивная Medium (500) */
         .next-btn {
             margin-top: 30px;
             width: 100%;
@@ -155,16 +97,11 @@
             color: var(--disabled-text);
             font-size: 18px;
             font-family: 'Inter', sans-serif;
-            font-weight: 500; /* Неактивная */
+            font-weight: 500;
             transition: 0.3s;
         }
 
-        .next-btn.active { 
-            background: var(--primary-color); 
-            color: white; 
-            cursor: pointer; 
-            font-weight: 700; /* Активная */
-        }
+        .next-btn.active { background: var(--primary-color); color: white; cursor: pointer; font-weight: 700; }
         
         .hidden { display: none; }
         .nav-arrow { color: #ccc; cursor: pointer; padding: 5px 10px; font-weight: 400; }
@@ -213,8 +150,6 @@
 
     function init() {
         renderCalendar();
-        document.getElementById('btn-to-time').onclick = () => { if(selectedFullDate) showStep(2); };
-        document.getElementById('btn-finish').onclick = () => { if(selectedSlots.length > 0) sendToBot(); };
     }
 
     function renderCalendar() {
@@ -240,9 +175,7 @@
         today.setHours(0,0,0,0);
 
         for(let i=0; i<offset; i++) {
-            const empty = document.createElement('div');
-            empty.className = 'day empty';
-            grid.appendChild(empty);
+            grid.appendChild(Object.assign(document.createElement('div'), {className: 'day empty'}));
         }
 
         for(let d=1; d<=daysInMonth; d++) {
@@ -265,96 +198,59 @@
         }
     }
 
-    // Замени существующую функцию renderTimeSlots и добавь переменную
-let selectedSlots = []; 
+    function renderTimeSlots() {
+        const container = document.getElementById('time-container');
+        container.innerHTML = '';
+        selectedSlots = [];
+        document.getElementById('btn-finish').classList.remove('active');
 
-function renderTimeSlots() {
-    const container = document.getElementById('time-container');
-    container.innerHTML = '';
-    selectedSlots = [];
-    document.getElementById('btn-finish').classList.remove('active');
-
-    // Генерируем 29 слотов (24 часа текущего дня + 5 часов следующего)
-    for (let i = 0; i < 29; i++) {
-        const hour = i % 24;
-        const nextHour = (i + 1) % 24;
-        
-        const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
-        const end = nextHour < 10 ? `0${nextHour}:00` : `${nextHour}:00`;
-        
-        // Пометка для слотов после полуночи
-        const isNextDay = i >= 24;
-        const timeStr = `${start} - ${end}${isNextDay ? ' (след. день)' : ''}`;
-        
-        const btn = document.createElement('button');
-        btn.className = 'time-slot';
-        btn.innerText = `${start} - ${end}`;
-        btn.dataset.index = i; // Сохраняем порядковый номер для проверки последовательности
-        
-        btn.onclick = function() {
-            const index = parseInt(this.dataset.index);
-
-            if (selectedSlots.length === 0) {
-                // Первый выбор
-                selectedSlots.push(index);
-                this.classList.add('selected');
-            } else {
-                const min = Math.min(...selectedSlots);
-                const max = Math.max(...selectedSlots);
-
-                if (selectedSlots.includes(index)) {
-                    // Если снимаем выделение, то только с краев
-                    if (index === min || index === max) {
-                        selectedSlots = selectedSlots.filter(s => s !== index);
-                        this.classList.remove('selected');
-                    } else {
-                        // Если кликнули в середину — сбрасываем и выбираем только этот
-                        resetSelection(index, this);
-                    }
+        for (let i = 0; i < 29; i++) {
+            const hour = i % 24;
+            const nextHour = (i + 1) % 24;
+            const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
+            const end = nextHour < 10 ? `0${nextHour}:00` : `${nextHour}:00`;
+            
+            const btn = document.createElement('button');
+            btn.className = 'time-slot';
+            btn.innerText = `${start} - ${end}`;
+            btn.dataset.index = i;
+            
+            btn.onclick = function() {
+                const index = parseInt(this.dataset.index);
+                if (selectedSlots.length === 0) {
+                    selectedSlots.push(index);
+                    this.classList.add('selected');
                 } else {
-                    // Проверка на последовательность
-                    if (index === min - 1 || index === max + 1) {
+                    const min = Math.min(...selectedSlots);
+                    const max = Math.max(...selectedSlots);
+
+                    if (selectedSlots.includes(index)) {
+                        if (index === min || index === max) {
+                            selectedSlots = selectedSlots.filter(s => s !== index);
+                            this.classList.remove('selected');
+                        } else {
+                            resetSelection(index, this);
+                        }
+                    } else if (index === min - 1 || index === max + 1) {
                         selectedSlots.push(index);
                         this.classList.add('selected');
                     } else {
-                        // Непоследовательный выбор — сбрасываем всё
                         resetSelection(index, this);
                     }
                 }
-            }
-            
-            // Активация кнопки "Далее"
-            const finishBtn = document.getElementById('btn-finish');
-            selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
-        };
-        container.appendChild(btn);
+                const finishBtn = document.getElementById('btn-finish');
+                selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
+            };
+            container.appendChild(btn);
+        }
     }
-}
 
-function resetSelection(newIndex, element) {
-    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-    selectedSlots = [newIndex];
-    element.classList.add('selected');
-}
+    function resetSelection(newIndex, element) {
+        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+        selectedSlots = [newIndex];
+        element.classList.add('selected');
+    }
 
-// Обнови функцию отправки, чтобы n8n понимал структуру
-function sendToBot() {
-    selectedSlots.sort((a, b) => a - b);
-    const startIdx = selectedSlots[0];
-    const endIdx = selectedSlots[selectedSlots.length - 1];
-    
-    const result = {
-        date: selectedFullDate.toISOString().split('T')[0],
-        start_index: startIdx,
-        end_index: endIdx + 1,
-        total_hours: selectedSlots.length,
-        // Формируем читаемую строку для n8n
-        display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`
-    };
-    
-    tg.sendData(JSON.stringify(result));
-    tg.close();
-}
     function showStep(step) {
         if (step === 2) {
             document.getElementById('step-date').classList.add('hidden');
@@ -372,10 +268,19 @@ function sendToBot() {
         renderCalendar();
     }
 
+    document.getElementById('btn-to-time').onclick = () => { if(selectedFullDate) showStep(2); };
+    document.getElementById('btn-finish').onclick = () => { if(selectedSlots.length > 0) sendToBot(); };
+
     function sendToBot() {
+        selectedSlots.sort((a, b) => a - b);
+        const startIdx = selectedSlots[0];
+        const endIdx = selectedSlots[selectedSlots.length - 1];
         const result = {
             date: selectedFullDate.toISOString().split('T')[0],
-            slots: selectedSlots.sort()
+            start_index: startIdx,
+            end_index: endIdx + 1,
+            total_hours: selectedSlots.length,
+            display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`
         };
         tg.sendData(JSON.stringify(result));
         tg.close();
