@@ -302,6 +302,20 @@
         
         btn.onclick = function() {
             const index = parseInt(this.dataset.index);
+            
+            // --- НОВАЯ ПРОВЕРКА ДЛЯ СЛЕДУЮЩЕГО ДНЯ ---
+            if (index >= 24) {
+                // Проверяем, выбран ли последний слот текущего дня (23:00 - 00:00)
+                const isLateNightSelected = selectedSlots.includes(23);
+                
+                if (!isLateNightSelected) {
+                    // Если 23:00 не выбрано, выводим предупреждение или просто игнорим
+                    tg.showAlert("Слоты следующего дня доступны только при бронировании ночной смены (после 23:00)");
+                    return; // Прерываем выполнение функции
+                }
+            }
+            // ------------------------------------------
+
             if (selectedSlots.length === 0) {
                 selectedSlots.push(index);
                 this.classList.add('selected');
@@ -310,25 +324,31 @@
                 const max = Math.max(...selectedSlots);
 
                 if (selectedSlots.includes(index)) {
+                    // Если снимаем выделение, проверяем, не "оторвем" ли мы завтрашний день
+                    if (index === 23 && selectedSlots.some(i => i >= 24)) {
+                        tg.showAlert("Сначала отмените слоты следующего дня");
+                        return;
+                    }
+
                     if (index === min || index === max) {
                         selectedSlots = selectedSlots.filter(s => s !== index);
                         this.classList.remove('selected');
                     } else {
                         resetSelection(index, this);
                     }
-                } else if (index === min - 1 || index === max + 1) {
-                    selectedSlots.push(index);
-                    this.classList.add('selected');
                 } else {
-                    resetSelection(index, this);
+                    if (index === min - 1 || index === max + 1) {
+                        selectedSlots.push(index);
+                        this.classList.add('selected');
+                    } else {
+                        resetSelection(index, this);
+                    }
                 }
             }
+            
             const finishBtn = document.getElementById('btn-finish');
             selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
         };
-        container.appendChild(btn);
-    }
-}
 
     function resetSelection(newIndex, element) {
         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
