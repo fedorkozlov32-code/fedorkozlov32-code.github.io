@@ -412,11 +412,11 @@
             });
     
             if (response.ok) {
-                tg.showConfirm("Бронь отправлена! Закрыть приложение?", (confirm) => {
-                    if (confirm) tg.close();
-                });
-            } else {
-                throw new Error('Server error');
+            // Переходим на страницу успеха
+            window.location.href = 'done.html'; 
+        } else {
+            throw new Error('Server error');
+        }hrow new Error('Server error');
             }
         } catch (error) {
             tg.showAlert("Ошибка при отправке.");
