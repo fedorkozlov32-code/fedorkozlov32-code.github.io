@@ -3,72 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Booking Studio</title>
+    <title>Studio Booking</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --primary-color: #2F5CFF;
             --bg-color: #ffffff;
-            --secondary-bg: #F5F5F5;
             --text-color: #000000;
-            --disabled-color: #F8F8F8;
-            --disabled-text: #E0E0E0;
+            --disabled-bg: #F8F8F8;
+            --disabled-text: #D0D0D0;
+            --inactive-text: #888888;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-color);
             margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            padding: 20px;
-            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .container {
-            width: 100%;
-            max-width: 400px;
-        }
-
-        h1 {
-            font-size: 42px;
-            font-weight: 700;
-            line-height: 1.1;
-            margin-bottom: 40px;
-            margin-top: 20px;
-        }
+        .container { width: 100%; max-width: 400px; }
+        
+        h1 { font-size: 42px; font-weight: 700; line-height: 1.1; margin: 20px 0 40px 0; }
 
         .card {
-            background: #FFFFFF;
+            background: #fff;
             border-radius: 35px;
             padding: 25px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.03);
-            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.04);
         }
 
-        /* Calendar Styles */
+        /* Calendar */
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: 700;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            text-transform: capitalize;
         }
 
         .days-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 10px;
+            gap: 8px;
+            text-align: center;
         }
 
-        .weekday {
-            font-size: 14px;
-            font-weight: 700;
-            color: #000;
-            margin-bottom: 10px;
-        }
-
+        .weekday { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        
         .day {
             aspect-ratio: 1;
             display: flex;
@@ -76,18 +62,16 @@
             justify-content: center;
             border-radius: 50%;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             transition: 0.2s;
         }
 
-        .day.selected {
-            background-color: var(--primary-color);
-            color: white;
-        }
+        .day.past { color: var(--disabled-text); cursor: default; }
+        .day.today { font-weight: 800; text-decoration: underline; }
+        .day.selected { background: var(--primary-color) !important; color: white !important; }
+        .day:not(.past):hover { background: #f0f0f0; }
 
-        .day.empty { color: #CCC; }
-
-        /* Time Grid Styles */
+        /* Time Grid */
         .time-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -95,45 +79,36 @@
         }
 
         .time-slot {
-            background-color: var(--disabled-color);
-            padding: 12px 5px;
-            border-radius: 15px;
+            background: var(--disabled-bg);
+            padding: 14px 0;
+            border-radius: 18px;
             font-size: 13px;
-            color: #666;
-            cursor: pointer;
+            color: var(--inactive-text);
             border: none;
+            cursor: pointer;
             transition: 0.2s;
         }
 
-        .time-slot.selected {
-            background-color: var(--primary-color);
-            color: white;
-        }
+        .time-slot.selected { background: var(--primary-color); color: white; }
 
         /* Button */
         .next-btn {
             margin-top: 30px;
             width: 100%;
-            padding: 18px;
-            border-radius: 20px;
+            padding: 20px;
+            border-radius: 22px;
             border: none;
-            background-color: var(--disabled-color);
+            background: var(--disabled-bg);
             color: var(--disabled-text);
             font-size: 18px;
             font-weight: 600;
-            cursor: not-allowed;
             transition: 0.3s;
         }
 
-        .next-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            cursor: pointer;
-        }
-
-        .hidden { display: none; }
+        .next-btn.active { background: var(--primary-color); color: white; cursor: pointer; }
         
-        .nav-arrow { color: #DDD; cursor: pointer; font-size: 20px; }
+        .hidden { display: none; }
+        .nav-arrow { color: #ccc; cursor: pointer; padding: 5px 10px; }
     </style>
 </head>
 <body>
@@ -143,25 +118,12 @@
         <h1>Выбери дату записи</h1>
         <div class="card">
             <div class="calendar-header">
-                <span class="nav-arrow">＜</span>
-                <span>Март 2026</span>
-                <span class="nav-arrow">＞</span>
+                <span class="nav-arrow" onclick="changeMonth(-1)">＜</span>
+                <span id="month-label">Март 2026</span>
+                <span class="nav-arrow" onclick="changeMonth(1)">＞</span>
             </div>
-            <div class="days-grid">
-                <div class="weekday">пн</div><div class="weekday">вт</div><div class="weekday">ср</div>
-                <div class="weekday">чт</div><div class="weekday">пт</div><div class="weekday">сб</div><div class="weekday">вс</div>
-                
-                <div class="day empty">27</div><div class="day empty">28</div>
-                <div class="day">1</div><div class="day">2</div><div class="day">3</div><div class="day">4</div><div class="day">5</div>
-                <div class="day">6</div><div class="day">7</div><div class="day">8</div><div class="day">9</div><div class="day">10</div>
-                <div class="day">11</div><div class="day">12</div><div class="day">13</div><div class="day">14</div>
-                <div class="day" onclick="selectDay(this, 15)">15</div>
-                <div class="day">16</div><div class="day">17</div><div class="day">18</div><div class="day">19</div>
-                <div class="day">20</div><div class="day">21</div><div class="day">22</div><div class="day">23</div>
-                <div class="day">24</div><div class="day">25</div><div class="day">26</div><div class="day">27</div>
-                <div class="day">28</div><div class="day">29</div><div class="day">30</div><div class="day">31</div>
-            </div>
-            <button id="btn-to-time" class="next-btn" onclick="goToTime()">далее</button>
+            <div class="days-grid" id="calendar-days"></div>
+            <button id="btn-to-time" class="next-btn">далее</button>
         </div>
     </div>
 
@@ -169,76 +131,139 @@
         <h1>Выбери время записи</h1>
         <div class="card">
             <div class="calendar-header">
-                <span class="nav-arrow" onclick="goToDate()">＜</span>
-                <span id="selected-date-label">15 марта 2026</span>
+                <span class="nav-arrow" onclick="showStep(1)">＜</span>
+                <span id="selected-date-title">15 марта 2026</span>
                 <span></span>
             </div>
-            <div class="time-grid" id="time-container">
-                </div>
-            <button id="btn-finish" class="next-btn" onclick="finishBooking()">далее</button>
+            <div class="time-grid" id="time-container"></div>
+            <button id="btn-finish" class="next-btn">далее</button>
         </div>
     </div>
 </div>
 
 <script>
-    let selectedDate = null;
-    let selectedTime = null;
-
-    // Инициализация Telegram WebApp
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    function selectDay(element, day) {
-        document.querySelectorAll('.day').forEach(d => d.classList.remove('selected'));
-        element.classList.add('selected');
-        selectedDate = day;
-        document.getElementById('btn-to-time').classList.add('active');
+    let currentViewDate = new Date(); // Дата для отображения календаря
+    let selectedFullDate = null;     // Выбранная дата (объект)
+    let selectedSlots = [];          // Массив выбранных временных слотов
+
+    const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+    const monthNamesGenitive = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+
+    function init() {
+        renderCalendar();
+        document.getElementById('btn-to-time').onclick = () => { if(selectedFullDate) showStep(2); };
+        document.getElementById('btn-finish').onclick = () => { if(selectedSlots.length > 0) sendToBot(); };
     }
 
-    function goToTime() {
-        if (!selectedDate) return;
-        document.getElementById('step-date').classList.add('hidden');
-        document.getElementById('step-time').classList.remove('hidden');
-        renderTimeSlots();
-    }
+    function renderCalendar() {
+        const grid = document.getElementById('calendar-days');
+        const label = document.getElementById('month-label');
+        grid.innerHTML = '';
+        
+        const year = currentViewDate.getFullYear();
+        const month = currentViewDate.getMonth();
+        label.innerText = `${monthNames[month]} ${year}`;
 
-    function goToDate() {
-        document.getElementById('step-time').classList.add('hidden');
-        document.getElementById('step-date').classList.remove('hidden');
+        // Дни недели
+        ['пн','вт','ср','чт','пт','сб','вс'].forEach(d => {
+            const div = document.createElement('div');
+            div.className = 'weekday';
+            div.innerText = d;
+            grid.appendChild(div);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const offset = firstDay === 0 ? 6 : firstDay - 1;
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        // Пустые ячейки (дни прошлого месяца)
+        for(let i=0; i<offset; i++) grid.appendChild(document.createElement('div'));
+
+        for(let d=1; d<=daysInMonth; d++) {
+            const dateObj = new Date(year, month, d);
+            const el = document.createElement('div');
+            el.className = 'day';
+            el.innerText = d;
+
+            if (dateObj < today) {
+                el.classList.add('past');
+            } else {
+                if (dateObj.getTime() === today.getTime()) el.classList.add('today');
+                if (selectedFullDate && dateObj.getTime() === selectedFullDate.getTime()) el.classList.add('selected');
+                
+                el.onclick = () => {
+                    selectedFullDate = dateObj;
+                    renderCalendar();
+                    document.getElementById('btn-to-time').classList.add('active');
+                };
+            }
+            grid.appendChild(el);
+        }
     }
 
     function renderTimeSlots() {
         const container = document.getElementById('time-container');
         container.innerHTML = '';
+        selectedSlots = [];
+        document.getElementById('btn-finish').classList.remove('active');
+
         for (let i = 0; i < 24; i++) {
             const start = i < 10 ? `0${i}:00` : `${i}:00`;
             const end = (i + 1) < 10 ? `0${i+1}:00` : (i+1 === 24 ? '00:00' : `${i+1}:00`);
-            const slot = document.createElement('button');
-            slot.className = 'time-slot';
-            slot.innerText = `${start} - ${end}`;
-            slot.onclick = function() {
-                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedTime = this.innerText;
-                document.getElementById('btn-finish').classList.add('active');
+            const timeStr = `${start} - ${end}`;
+            
+            const btn = document.createElement('button');
+            btn.className = 'time-slot';
+            btn.innerText = timeStr;
+            
+            btn.onclick = () => {
+                if (selectedSlots.includes(timeStr)) {
+                    selectedSlots = selectedSlots.filter(s => s !== timeStr);
+                    btn.classList.remove('selected');
+                } else {
+                    selectedSlots.push(timeStr);
+                    btn.classList.add('selected');
+                }
+                
+                const finishBtn = document.getElementById('btn-finish');
+                selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
             };
-            container.appendChild(slot);
+            container.appendChild(btn);
         }
     }
 
-    function finishBooking() {
-        if (!selectedTime) return;
-        
-        // Отправка данных обратно в бот (для n8n)
-        const data = {
-            date: `2026-03-${selectedDate}`,
-            time: selectedTime
+    function showStep(step) {
+        if (step === 2) {
+            document.getElementById('step-date').classList.add('hidden');
+            document.getElementById('step-time').classList.remove('hidden');
+            document.getElementById('selected-date-title').innerText = `${selectedFullDate.getDate()} ${monthNamesGenitive[selectedFullDate.getMonth()]} ${selectedFullDate.getFullYear()}`;
+            renderTimeSlots();
+        } else {
+            document.getElementById('step-time').classList.add('hidden');
+            document.getElementById('step-date').classList.remove('hidden');
+        }
+    }
+
+    function changeMonth(dir) {
+        currentViewDate.setMonth(currentViewDate.getMonth() + dir);
+        renderCalendar();
+    }
+
+    function sendToBot() {
+        const result = {
+            date: selectedFullDate.toISOString().split('T')[0],
+            slots: selectedSlots.sort()
         };
-        
-        tg.sendData(JSON.stringify(data));
+        tg.sendData(JSON.stringify(result));
         tg.close();
     }
-</script>
 
+    init();
+</script>
 </body>
 </html>
