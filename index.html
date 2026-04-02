@@ -298,44 +298,51 @@
             btn.dataset.index = i;
             
             btn.onclick = function() {
-                const index = parseInt(this.dataset.index);
-                
-                if (index >= 24 && !selectedSlots.includes(23)) {
-                    tg.showAlert("Слоты следующего дня доступны только после выбора 23:00");
-                    return;
-                }
-    
-                if (selectedSlots.length === 0) {
-                    selectedSlots.push(index);
-                    this.classList.add('selected');
-                } else {
-                    const min = Math.min(...selectedSlots);
-                    const max = Math.max(...selectedSlots);
-    
-                    if (selectedSlots.includes(index)) {
-                        if (index === 23 && selectedSlots.some(i => i >= 24)) {
-                            tg.showAlert("Сначала отмените слоты следующего дня");
-                            return;
-                        }
-                        if (index === min || index === max) {
-                            selectedSlots = selectedSlots.filter(s => s !== index);
-                            this.classList.remove('selected');
-                        } else {
-                            resetSelection(index, this);
-                        }
+            const index = parseInt(this.dataset.index);
+            
+            // Проверка на слоты следующего дня (оставляем твою логику)
+            if (index >= 24 && !selectedSlots.includes(23)) {
+                tg.showAlert("Слоты следующего дня доступны только после выбора 23:00");
+                return;
+            }
+
+            if (selectedSlots.length === 0) {
+                // Если еще ничего не выбрано — выбираем первый слот
+                selectedSlots.push(index);
+            } else {
+                const min = Math.min(...selectedSlots);
+                const max = Math.max(...selectedSlots);
+
+                if (selectedSlots.includes(index)) {
+                    // Если нажали на уже выбранный слот:
+                    // Если это крайний (минимум или максимум) — убираем его
+                    if (index === min || index === max) {
+                        selectedSlots = selectedSlots.filter(s => s !== index);
                     } else {
-                        if (index === min - 1 || index === max + 1) {
-                            selectedSlots.push(index);
-                            this.classList.add('selected');
-                        } else {
-                            resetSelection(index, this);
-                        }
+                        // Если нажали в середину — сбрасываем всё и выбираем только этот слот
+                        selectedSlots = [index];
+                    }
+                } else {
+                    // ЕСЛИ ВЫБИРАЕМ НОВЫЙ СЛОТ:
+                    // Находим новые границы (минимум и максимум между текущим выбором и новым кликом)
+                    const newMin = Math.min(min, index);
+                    const newMax = Math.max(max, index);
+                    
+                    // Заполняем массив ВСЕМИ числами от newMin до newMax
+                    selectedSlots = [];
+                    for (let i = newMin; i <= newMax; i++) {
+                        selectedSlots.push(i);
                     }
                 }
-                
-                const finishBtn = document.getElementById('btn-finish');
-                selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
-            };
+            }
+            
+            // Обновляем визуальное выделение всех кнопок
+            updateSlotSelection();
+            
+            // Активация кнопки "Далее"
+            const finishBtn = document.getElementById('btn-finish');
+            selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
+        };
             container.appendChild(btn);
         }
     }
@@ -345,6 +352,18 @@
         selectedSlots = [newIndex];
         element.classList.add('selected');
     }
+
+    function updateSlotSelection() {
+    // Проходим по всем кнопкам и проверяем, есть ли их индекс в массиве selectedSlots
+    document.querySelectorAll('.time-slot').forEach(btn => {
+        const idx = parseInt(btn.dataset.index);
+        if (selectedSlots.includes(idx)) {
+            btn.classList.add('selected');
+        } else {
+            btn.classList.remove('selected');
+        }
+    });
+}
     
     function showStep(step) {
         if (step === 2) {
