@@ -209,18 +209,20 @@
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-
+    
     let currentViewDate = new Date();
     let selectedFullDate = null;
     let selectedSlots = [];
-
+    
     const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
     const monthNamesGenitive = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-
+    
     function init() {
         renderCalendar();
+        document.getElementById('btn-to-time').onclick = () => { if(selectedFullDate) showStep(2); };
+        document.getElementById('btn-finish').onclick = () => { if(selectedSlots.length > 0) sendToBot(); };
     }
-
+    
     function renderCalendar() {
         const grid = document.getElementById('calendar-days');
         const label = document.getElementById('month-label');
@@ -229,30 +231,32 @@
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
         label.innerText = `${monthNames[month]} ${year}`;
-
+    
         ['пн','вт','ср','чт','пт','сб','вс'].forEach(d => {
             const div = document.createElement('div');
             div.className = 'weekday';
             div.innerText = d;
             grid.appendChild(div);
         });
-
+    
         const firstDay = new Date(year, month, 1).getDay();
         const offset = firstDay === 0 ? 6 : firstDay - 1;
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const today = new Date();
         today.setHours(0,0,0,0);
-
+    
         for(let i=0; i<offset; i++) {
-            grid.appendChild(Object.assign(document.createElement('div'), {className: 'day empty'}));
+            const empty = document.createElement('div');
+            empty.className = 'day empty';
+            grid.appendChild(empty);
         }
-
+    
         for(let d=1; d<=daysInMonth; d++) {
             const dateObj = new Date(year, month, d);
             const el = document.createElement('div');
             el.className = 'day';
             el.innerText = d;
-
+    
             if (dateObj < today) {
                 el.classList.add('past');
             } else {
@@ -266,121 +270,143 @@
             grid.appendChild(el);
         }
     }
-
+    
     function renderTimeSlots() {
-    const container = document.getElementById('time-container');
-    container.innerHTML = '';
-    selectedSlots = [];
-    document.getElementById('btn-finish').classList.remove('active');
-
-    // 24 часа сегодня + 6 часов завтра = 30 слотов
-    for (let i = 0; i < 30; i++) {
-        
-        // --- ДОБАВЛЯЕМ РАЗДЕЛИТЕЛЬ ПЕРЕД 00:00 ---
-        if (i === 24) {
-            const divider = document.createElement('div');
-            divider.className = 'night-divider';
-            divider.innerHTML = '<span>Следующий день</span>';
-            container.appendChild(divider);
+        const container = document.getElementById('time-container');
+        container.innerHTML = '';
+        selectedSlots = [];
+        document.getElementById('btn-finish').classList.remove('active');
+    
+        for (let i = 0; i < 30; i++) {
+            if (i === 24) {
+                const divider = document.createElement('div');
+                divider.className = 'night-divider';
+                divider.innerHTML = '<span>Следующий день</span>';
+                container.appendChild(divider);
+            }
+    
+            const hour = i % 24;
+            const nextHour = (i + 1) % 24;
+            const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
+            const end = nextHour < 10 ? `0${nextHour}:00` : `${nextHour}:00`;
+            
+            const btn = document.createElement('button');
+            btn.className = 'time-slot';
+            if (i >= 24) btn.classList.add('next-day-slot');
+    
+            btn.innerText = `${start} - ${end}`;
+            btn.dataset.index = i;
+            
+            btn.onclick = function() {
+                const index = parseInt(this.dataset.index);
+                
+                if (index >= 24 && !selectedSlots.includes(23)) {
+                    tg.showAlert("Слоты следующего дня доступны только после выбора 23:00");
+                    return;
+                }
+    
+                if (selectedSlots.length === 0) {
+                    selectedSlots.push(index);
+                    this.classList.add('selected');
+                } else {
+                    const min = Math.min(...selectedSlots);
+                    const max = Math.max(...selectedSlots);
+    
+                    if (selectedSlots.includes(index)) {
+                        if (index === 23 && selectedSlots.some(i => i >= 24)) {
+                            tg.showAlert("Сначала отмените слоты следующего дня");
+                            return;
+                        }
+                        if (index === min || index === max) {
+                            selectedSlots = selectedSlots.filter(s => s !== index);
+                            this.classList.remove('selected');
+                        } else {
+                            resetSelection(index, this);
+                        }
+                    } else {
+                        if (index === min - 1 || index === max + 1) {
+                            selectedSlots.push(index);
+                            this.classList.add('selected');
+                        } else {
+                            resetSelection(index, this);
+                        }
+                    }
+                }
+                
+                const finishBtn = document.getElementById('btn-finish');
+                selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
+            };
+            container.appendChild(btn);
         }
-
-        const hour = i % 24;
-        const nextHour = (i + 1) % 24;
-        const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
-        const end = nextHour < 10 ? `0${nextHour}:00` : `${nextHour}:00`;
-        
-        const btn = document.createElement('button');
-        btn.className = 'time-slot';
-        
-        // Если это следующий день, добавляем спец. класс
-        if (i >= 24) {
-            btn.classList.add('next-day-slot');
-        }
-
-        btn.innerText = `${start} - ${end}`;
-        btn.dataset.index = i;
-        
-        btn.onclick = function() {// ... (внутри цикла for)
-            const finishBtn = document.getElementById('btn-finish');
-            selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
-        };
-        container.appendChild(btn);
-    } // ЗАКРЫВАЕМ ЦИКЛ FOR
-} // ЗАКРЫВАЕМ ФУНКЦИЮ renderTimeSlots
-
-function resetSelection(newIndex, element) {
-    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-    selectedSlots = [newIndex];
-    element.classList.add('selected');
-}
-
-function showStep(step) {
-    if (step === 2) {
-        document.getElementById('step-date').classList.add('hidden');
-        document.getElementById('step-time').classList.remove('hidden');
-        document.getElementById('selected-date-title').innerText = `${selectedFullDate.getDate()} ${monthNamesGenitive[selectedFullDate.getMonth()]} ${selectedFullDate.getFullYear()}`;
-        renderTimeSlots();
-    } else {
-        document.getElementById('step-time').classList.add('hidden');
-        document.getElementById('step-date').classList.remove('hidden');
     }
-}
-
-function changeMonth(dir) {
-    currentViewDate.setMonth(currentViewDate.getMonth() + dir);
-    renderCalendar();
-}
-
-// Назначаем обработчики кликов при инициализации
-document.getElementById('btn-to-time').onclick = () => { if(selectedFullDate) showStep(2); };
-document.getElementById('btn-finish').onclick = () => { if(selectedSlots.length > 0) sendToBot(); };
-
-async function sendToBot() {
-    const btn = document.getElementById('btn-finish');
-    btn.classList.add('loading');
-
-    selectedSlots.sort((a, b) => a - b);
-    const startIdx = selectedSlots[0];
-    const endIdx = selectedSlots[selectedSlots.length - 1];
     
-    const year = selectedFullDate.getFullYear();
-    const month = String(selectedFullDate.getMonth() + 1).padStart(2, '0');
-    const day = String(selectedFullDate.getDate()).padStart(2, '0');
-    const formattedDate = `${year}-${month}-${day}`;
+    function resetSelection(newIndex, element) {
+        document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+        selectedSlots = [newIndex];
+        element.classList.add('selected');
+    }
     
-    const bookingData = {
-        user: tg.initDataUnsafe.user,
-        date: formattedDate,
-        display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`,
-        slots: selectedSlots,
-        duration: selectedSlots.length,
-        is_overnight: endIdx >= 24
-    };
-
-    const WEBHOOK_URL = 'https://n8ndex.ru/webhook-test/4b890fd5-6b71-480b-9c18-60eb4d5a9138';
-
-    try {
-        const response = await fetch(WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(bookingData)
-        });
-
-        if (response.ok) {
-            tg.showConfirm("Бронь отправлена! Закрыть приложение?", (confirm) => {
-                if (confirm) tg.close();
-            });
+    function showStep(step) {
+        if (step === 2) {
+            document.getElementById('step-date').classList.add('hidden');
+            document.getElementById('step-time').classList.remove('hidden');
+            document.getElementById('selected-date-title').innerText = `${selectedFullDate.getDate()} ${monthNamesGenitive[selectedFullDate.getMonth()]} ${selectedFullDate.getFullYear()}`;
+            renderTimeSlots();
         } else {
-            throw new Error('Server error');
+            document.getElementById('step-time').classList.add('hidden');
+            document.getElementById('step-date').classList.remove('hidden');
         }
-    } catch (error) {
-        tg.showAlert("Ошибка при отправке. Попробуй еще раз.");
-    } finally {
-        btn.classList.remove('loading');
     }
-}
-
-init();
+    
+    function changeMonth(dir) {
+        currentViewDate.setMonth(currentViewDate.getMonth() + dir);
+        renderCalendar();
+    }
+    
+    async function sendToBot() {
+        const btn = document.getElementById('btn-finish');
+        btn.classList.add('loading');
+    
+        selectedSlots.sort((a, b) => a - b);
+        const startIdx = selectedSlots[0];
+        const endIdx = selectedSlots[selectedSlots.length - 1];
+        
+        const year = selectedFullDate.getFullYear();
+        const month = String(selectedFullDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedFullDate.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        
+        const bookingData = {
+            user: tg.initDataUnsafe.user,
+            date: formattedDate,
+            display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`,
+            slots: selectedSlots,
+            duration: selectedSlots.length,
+            is_overnight: endIdx >= 24
+        };
+    
+        try {
+            const response = await fetch('https://n8ndex.ru/webhook-test/4b890fd5-6b71-480b-9c18-60eb4d5a9138', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingData)
+            });
+    
+            if (response.ok) {
+                tg.showConfirm("Бронь отправлена! Закрыть приложение?", (confirm) => {
+                    if (confirm) tg.close();
+                });
+            } else {
+                throw new Error('Server error');
+            }
+        } catch (error) {
+            tg.showAlert("Ошибка при отправке.");
+        } finally {
+            btn.classList.remove('loading');
+        }
+    }
+    
+    init();
 </script>
 </body>
 </html>
