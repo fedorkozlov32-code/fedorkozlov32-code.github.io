@@ -135,11 +135,43 @@
             transition: 0.3s;
         }
 
+        /* Анимация вращения */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            display: none; /* По умолчанию скрыт */
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto;
+        }
+        
+        /* Когда кнопка в режиме загрузки */
+        .next-btn.loading {
+            color: transparent !important; /* Прячем текст */
+            pointer-events: none; /* Запрещаем повторные клики */
+            position: relative;
+        }
+        
+        .next-btn.loading .spinner {
+            display: block;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+        }
+
         .next-btn.active { background: var(--primary-color); color: white; cursor: pointer; font-weight: 700; }
         
         .hidden { display: none; }
         .nav-arrow { color: #ccc; cursor: pointer; padding: 5px 10px; font-weight: 400; }
-    </style>
+    </style> 
 </head>
 <body>
 
@@ -166,7 +198,10 @@
                 <span></span>
             </div>
             <div class="time-grid" id="time-container"></div>
-            <button id="btn-finish" class="next-btn">далее</button>
+            <button id="btn-finish" class="next-btn">
+                <span>далее</span>
+                <div class="spinner"></div>
+            </button>
         </div>
     </div>
 </div>
@@ -322,46 +357,44 @@
     document.getElementById('btn-finish').onclick = () => { if(selectedSlots.length > 0) sendToBot(); };
 
     async function sendToBot() {
-    selectedSlots.sort((a, b) => a - b);
+    const btn = document.getElementById('btn-finish');
     
+    // 1. Включаем режим загрузки
+    btn.classList.add('loading');
+
+    selectedSlots.sort((a, b) => a - b);
     const startIdx = selectedSlots[0];
     const endIdx = selectedSlots[selectedSlots.length - 1];
     
     const bookingData = {
-        // Данные о пользователе из Telegram (имя, id, username)
         user: tg.initDataUnsafe.user,
-        // Выбранные данные
         date: selectedFullDate.toISOString().split('T')[0],
         display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`,
         slots: selectedSlots,
-        duration: selectedSlots.length,
-        is_overnight: endIdx >= 24
+        duration: selectedSlots.length
     };
 
-    // ЗАМЕНИ ЭТУ ССЫЛКУ на свой Production Webhook URL из n8n
     const WEBHOOK_URL = 'https://n8ndex.ru/webhook-test/4b890fd5-6b71-480b-9c18-60eb4d5a9138';
 
     try {
-        // Отправляем данные фоновым запросом
         const response = await fetch(WEBHOOK_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(bookingData)
         });
 
         if (response.ok) {
-            // Если n8n ответил "ОК", показываем уведомление и закрываем
-            tg.showAlert("Бронирование успешно отправлено!", () => {
-                tg.close();
+            tg.showConfirm("Бронь отправлена! Закрыть приложение?", (confirm) => {
+                if (confirm) tg.close();
             });
         } else {
-            tg.showAlert("Ошибка при отправке. Попробуйте еще раз.");
+            throw new Error('Server error');
         }
     } catch (error) {
-        tg.showAlert("Не удалось связаться с сервером.");
-        console.error(error);
+        tg.showAlert("Ошибка при отправке. Попробуй еще раз.");
+    } finally {
+        // 2. Выключаем режим загрузки (даже если произошла ошибка)
+        btn.classList.remove('loading');
     }
 }
 
