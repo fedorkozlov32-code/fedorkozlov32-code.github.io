@@ -321,20 +321,49 @@
     document.getElementById('btn-to-time').onclick = () => { if(selectedFullDate) showStep(2); };
     document.getElementById('btn-finish').onclick = () => { if(selectedSlots.length > 0) sendToBot(); };
 
-    function sendToBot() {
-        selectedSlots.sort((a, b) => a - b);
-        const startIdx = selectedSlots[0];
-        const endIdx = selectedSlots[selectedSlots.length - 1];
-        const result = {
-            date: selectedFullDate.toISOString().split('T')[0],
-            start_index: startIdx,
-            end_index: endIdx + 1,
-            total_hours: selectedSlots.length,
-            display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`
-        };
-        tg.sendData(JSON.stringify(result));
-        tg.close();
+    async function sendToBot() {
+    selectedSlots.sort((a, b) => a - b);
+    
+    const startIdx = selectedSlots[0];
+    const endIdx = selectedSlots[selectedSlots.length - 1];
+    
+    const bookingData = {
+        // Данные о пользователе из Telegram (имя, id, username)
+        user: tg.initDataUnsafe.user,
+        // Выбранные данные
+        date: selectedFullDate.toISOString().split('T')[0],
+        display_time: `${startIdx % 24}:00 - ${(endIdx + 1) % 24}:00`,
+        slots: selectedSlots,
+        duration: selectedSlots.length,
+        is_overnight: endIdx >= 24
+    };
+
+    // ЗАМЕНИ ЭТУ ССЫЛКУ на свой Production Webhook URL из n8n
+    const WEBHOOK_URL = 'https://n8ndex.ru/webhook-test/4b890fd5-6b71-480b-9c18-60eb4d5a9138';
+
+    try {
+        // Отправляем данные фоновым запросом
+        const response = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bookingData)
+        });
+
+        if (response.ok) {
+            // Если n8n ответил "ОК", показываем уведомление и закрываем
+            tg.showAlert("Бронирование успешно отправлено!", () => {
+                tg.close();
+            });
+        } else {
+            tg.showAlert("Ошибка при отправке. Попробуйте еще раз.");
+        }
+    } catch (error) {
+        tg.showAlert("Не удалось связаться с сервером.");
+        console.error(error);
     }
+}
 
     init();
 </script>
