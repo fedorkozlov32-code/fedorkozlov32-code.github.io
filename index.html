@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Studio Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -16,7 +19,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
@@ -27,7 +30,14 @@
 
         .container { width: 100%; max-width: 400px; }
         
-        h1 { font-size: 42px; font-weight: 700; line-height: 1.1; margin: 20px 0 40px 0; }
+        /* Заголовок (выбери дату) - Semi Bold (600) */
+        h1 { 
+            font-size: 42px; 
+            font-weight: 600; 
+            line-height: 1.1; 
+            margin: 20px 0 40px 0; 
+            letter-spacing: -1px;
+        }
 
         .card {
             background: #fff;
@@ -36,14 +46,15 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.04);
         }
 
-        /* Calendar */
+        /* Месяц и год - Extra Bold (800) */
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-weight: 700;
+            font-weight: 800;
             margin-bottom: 25px;
             text-transform: capitalize;
+            font-size: 17px;
         }
 
         .days-grid {
@@ -53,8 +64,15 @@
             text-align: center;
         }
 
-        .weekday { font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+        /* День недели (пн, вт) - Bold (700) */
+        .weekday { 
+            font-size: 14px; 
+            font-weight: 700; 
+            margin-bottom: 10px; 
+            color: var(--text-color);
+        }
         
+        /* Числа в календаре: активные Medium (500), неактивные Regular (400) */
         .day {
             aspect-ratio: 1;
             display: flex;
@@ -64,20 +82,27 @@
             cursor: pointer;
             font-size: 15px;
             transition: 0.2s;
+            font-weight: 500; /* По умолчанию активные */
         }
 
-        .day.past { color: var(--disabled-text); cursor: default; }
-        .day.today { font-weight: 800; text-decoration: underline; }
-        .day.selected { background: var(--primary-color) !important; color: white !important; }
-        .day:not(.past):hover { background: #f0f0f0; }
-
-        /* Time Grid */
-        .time-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+        .day.past { 
+            color: var(--disabled-text); 
+            cursor: default; 
+            font-weight: 400; /* Неактивные (прошедшие) */
+        }
+        
+        .day.empty {
+            font-weight: 400; /* Пустые ячейки */
+            color: var(--disabled-text);
         }
 
+        .day.selected { 
+            background: var(--primary-color) !important; 
+            color: white !important; 
+            font-weight: 600; 
+        }
+
+        /* Слоты времени - Medium (500) */
         .time-slot {
             background: var(--disabled-bg);
             padding: 14px 0;
@@ -86,12 +111,14 @@
             color: var(--inactive-text);
             border: none;
             cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
             transition: 0.2s;
         }
 
         .time-slot.selected { background: var(--primary-color); color: white; }
 
-        /* Button */
+        /* Текст на кнопке далее: активная Bold (700), неактивная Medium (500) */
         .next-btn {
             margin-top: 30px;
             width: 100%;
@@ -101,14 +128,20 @@
             background: var(--disabled-bg);
             color: var(--disabled-text);
             font-size: 18px;
-            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500; /* Неактивная */
             transition: 0.3s;
         }
 
-        .next-btn.active { background: var(--primary-color); color: white; cursor: pointer; }
+        .next-btn.active { 
+            background: var(--primary-color); 
+            color: white; 
+            cursor: pointer; 
+            font-weight: 700; /* Активная */
+        }
         
         .hidden { display: none; }
-        .nav-arrow { color: #ccc; cursor: pointer; padding: 5px 10px; }
+        .nav-arrow { color: #ccc; cursor: pointer; padding: 5px 10px; font-weight: 400; }
     </style>
 </head>
 <body>
@@ -119,7 +152,7 @@
         <div class="card">
             <div class="calendar-header">
                 <span class="nav-arrow" onclick="changeMonth(-1)">＜</span>
-                <span id="month-label">Март 2026</span>
+                <span id="month-label"></span>
                 <span class="nav-arrow" onclick="changeMonth(1)">＞</span>
             </div>
             <div class="days-grid" id="calendar-days"></div>
@@ -132,7 +165,7 @@
         <div class="card">
             <div class="calendar-header">
                 <span class="nav-arrow" onclick="showStep(1)">＜</span>
-                <span id="selected-date-title">15 марта 2026</span>
+                <span id="selected-date-title"></span>
                 <span></span>
             </div>
             <div class="time-grid" id="time-container"></div>
@@ -145,9 +178,9 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    let currentViewDate = new Date(); // Дата для отображения календаря
-    let selectedFullDate = null;     // Выбранная дата (объект)
-    let selectedSlots = [];          // Массив выбранных временных слотов
+    let currentViewDate = new Date();
+    let selectedFullDate = null;
+    let selectedSlots = [];
 
     const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
     const monthNamesGenitive = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
@@ -167,7 +200,6 @@
         const month = currentViewDate.getMonth();
         label.innerText = `${monthNames[month]} ${year}`;
 
-        // Дни недели
         ['пн','вт','ср','чт','пт','сб','вс'].forEach(d => {
             const div = document.createElement('div');
             div.className = 'weekday';
@@ -181,8 +213,11 @@
         const today = new Date();
         today.setHours(0,0,0,0);
 
-        // Пустые ячейки (дни прошлого месяца)
-        for(let i=0; i<offset; i++) grid.appendChild(document.createElement('div'));
+        for(let i=0; i<offset; i++) {
+            const empty = document.createElement('div');
+            empty.className = 'day empty';
+            grid.appendChild(empty);
+        }
 
         for(let d=1; d<=daysInMonth; d++) {
             const dateObj = new Date(year, month, d);
@@ -193,9 +228,7 @@
             if (dateObj < today) {
                 el.classList.add('past');
             } else {
-                if (dateObj.getTime() === today.getTime()) el.classList.add('today');
                 if (selectedFullDate && dateObj.getTime() === selectedFullDate.getTime()) el.classList.add('selected');
-                
                 el.onclick = () => {
                     selectedFullDate = dateObj;
                     renderCalendar();
@@ -220,7 +253,6 @@
             const btn = document.createElement('button');
             btn.className = 'time-slot';
             btn.innerText = timeStr;
-            
             btn.onclick = () => {
                 if (selectedSlots.includes(timeStr)) {
                     selectedSlots = selectedSlots.filter(s => s !== timeStr);
@@ -229,7 +261,6 @@
                     selectedSlots.push(timeStr);
                     btn.classList.add('selected');
                 }
-                
                 const finishBtn = document.getElementById('btn-finish');
                 selectedSlots.length > 0 ? finishBtn.classList.add('active') : finishBtn.classList.remove('active');
             };
