@@ -103,9 +103,12 @@
         }
 
         /* Слоты времени - Medium (500) */
+        /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ СЛОТОВ ВРЕМЕНИ --- */
         .time-slot {
             background: var(--disabled-bg);
-            padding: 14px 0;
+            /* Уменьшили вертикальный padding с 14px до 10px, 
+               чтобы текст не склеивался */
+            padding: 10px 0; 
             border-radius: 18px;
             font-size: 13px;
             color: var(--inactive-text);
@@ -114,7 +117,13 @@
             font-family: 'Inter', sans-serif;
             font-weight: 500;
             transition: 0.2s;
+            
+            /* Добавляем, чтобы текст точно не вылезал */
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
         }
+        /* ------------------------------------------- */
 
         .time-slot.selected { background: var(--primary-color); color: white; }
 
