@@ -180,7 +180,7 @@
         container.innerHTML = '';
         selectedSlots = [];
         document.getElementById('btn-finish').classList.remove('active');
-    
+
         for (let i = 0; i < 30; i++) {
             if (i === 24) {
                 const divider = document.createElement('div');
@@ -188,7 +188,7 @@
                 divider.innerText = "Следующий день";
                 container.appendChild(divider);
             }
-    
+
             const hour = i % 24;
             const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
             
@@ -196,11 +196,10 @@
             btn.className = 'time-slot';
             btn.dataset.index = i;
             if (i >= 24) btn.classList.add('next-day-slot');
-    
-            // ГЛАВНОЕ ИСПРАВЛЕНИЕ:
-            // Так как n8n присылает 24, 25 и т.д., мы просто проверяем наличие индекса i
+
+            // Проверка на занятость (сравниваем с индексами 0-29)
             const isBooked = window.busySlots && window.busySlots.includes(i);
-    
+
             if (isBooked) {
                 btn.classList.add('booked');
                 btn.innerText = `${start} • Занято`;
@@ -209,12 +208,61 @@
                 btn.innerText = start;
                 btn.onclick = function() {
                     const index = parseInt(this.dataset.index);
-                    
-                    // Твоя логика выбора диапазона (оставляем без изменений)
-                    handleSlotSelection(index); 
+                    handleSlotSelection(index); // Теперь эта функция определена ниже
                 };
             }
             container.appendChild(btn);
+        }
+    }
+
+    // ВОТ ЭТА ФУНКЦИЯ БЫЛА ПРОПУЩЕНА:
+    function handleSlotSelection(index) {
+        if (index >= 24 && !selectedSlots.includes(23)) {
+            tg.showAlert("Слоты следующего дня доступны только после 23:00");
+            return;
+        }
+
+        if (selectedSlots.length === 0) {
+            selectedSlots.push(index);
+        } else {
+            const min = Math.min(...selectedSlots);
+            const max = Math.max(...selectedSlots);
+
+            if (selectedSlots.includes(index)) {
+                // Если кликнули по уже выбранному
+                if (index === 23 && selectedSlots.some(i => i >= 24)) {
+                    tg.showAlert("Сначала отмените слоты следующего дня");
+                    return;
+                }
+                if (index === min || index === max) {
+                    selectedSlots = selectedSlots.filter(s => s !== index);
+                } else {
+                    selectedSlots = [index];
+                }
+            } else {
+                // Выбор диапазона
+                const newMin = Math.min(min, index);
+                const newMax = Math.max(max, index);
+                selectedSlots = [];
+                for (let k = newMin; k <= newMax; k++) {
+                    // Проверяем, нет ли занятых слотов внутри диапазона
+                    if (window.busySlots.includes(k)) {
+                        tg.showAlert("В выбранном диапазоне есть занятое время");
+                        selectedSlots = [index]; // Сбрасываем на один выбранный слот
+                        break;
+                    }
+                    selectedSlots.push(k);
+                }
+            }
+        }
+        
+        updateSlotSelection();
+        
+        const finishBtn = document.getElementById('btn-finish');
+        if (selectedSlots.length > 0) {
+            finishBtn.classList.add('active');
+        } else {
+            finishBtn.classList.remove('active');
         }
     }
     
