@@ -93,6 +93,14 @@
             opacity: 0.6;
         }
 
+        .time-slot.booked {
+            background: #F0F0F0 !important;
+            color: #B0B0B0 !important;
+            cursor: not-allowed;
+            box-shadow: none !important;
+            border: 1px dashed #DDD;
+        }
+
         /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ СТРЕЛОЧЕК --- */
         .nav-arrow { 
             width: 32px;
@@ -297,12 +305,30 @@
         document.getElementById('btn-finish').classList.remove('active');
     
         for (let i = 0; i < 30; i++) {
-            if (i === 24) {
-                const divider = document.createElement('div');
-                divider.className = 'night-divider';
-                divider.innerText = 'Следующий день';
-                container.appendChild(divider);
+            // ... логика разделителя "Следующий день" ...
+            const hour = i % 24;
+            const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
+            
+            const btn = document.createElement('button');
+            btn.className = 'time-slot';
+            
+            // ПРОВЕРКА НА ЗАНЯТОСТЬ
+            // Используем hour (0-23), чтобы сопоставить с данными из календаря
+            const isBooked = window.busySlots && window.busySlots.includes(hour);
+        
+            if (isBooked) {
+                btn.classList.add('booked'); // Серый стиль
+                btn.innerText = `${start} • Занято`;
+                btn.disabled = true; // Выключаем клик
+            } else {
+                btn.innerText = start;
+                btn.dataset.index = i;
+                btn.onclick = function() {
+                    // Твоя логика выбора (диапазоны и т.д.)
+                };
             }
+            container.appendChild(btn);
+        }
             const hour = i % 24;
             const start = hour < 10 ? `0${hour}:00` : `${hour}:00`;
             const btn = document.createElement('button');
@@ -364,8 +390,23 @@
 
         try {
             // Запрашиваем занятые слоты у n8n
-            const response = await fetch(`https://n8ndex.ru/webhook-test/calendar?date=${dateStr}`);
-            const data = await response.json();
+            // ... внутри try блока функции showStep ...
+            const response = await fetch(`https://n8ndex.ru/webhook/get-slots?date=${dateStr}`);
+            const rawData = await response.text(); // Сначала получаем как текст
+            
+            console.log("Сырые данные от n8n:", rawData);
+            
+            // Превращаем строку "00:00, 01:00" в массив чисел [0, 1]
+            if (rawData && rawData.trim().length > 0) {
+                window.busySlots = rawData.split(',').map(slot => {
+                    return parseInt(slot.trim().split(':')[0]); 
+                });
+            } else {
+                window.busySlots = [];
+            }
+            
+            console.log("Обработанные индексы:", window.busySlots); // Должно быть [0, 1, 4]
+            // ... дальше идет переключение шага и renderTimeSlots() ...
             
             // Сохраняем во временную переменную
             window.busySlots = data.busySlots || []; 
