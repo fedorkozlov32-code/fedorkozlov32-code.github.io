@@ -60,6 +60,7 @@
             font-size: 17px;
         }
 
+        /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ СТРЕЛОЧЕК --- */
         .nav-arrow { 
             width: 32px;
             height: 32px;
@@ -69,10 +70,12 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 16px; /* Немного увеличили размер шрифта для стрелки */
             transition: 0.2s;
+            color: var(--text-color); /* Сделали стрелку черной */
         }
         .nav-arrow:active { transform: scale(0.9); background: var(--secondary-bg); }
+        /* -------------------------------------- */
 
         .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
         .weekday { font-size: 12px; font-weight: 700; margin-bottom: 10px; color: var(--disabled-text); text-transform: uppercase; }
