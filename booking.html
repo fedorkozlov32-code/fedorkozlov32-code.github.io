@@ -290,7 +290,10 @@
                 const username = user.username || '';
     
                 // Добавляем параметры в URL: date, userId и username
-                const url = `https://n8ndex.ru/webhook-test/calendar?date=${dateStr}&userId=${userId}&username=${encodeURIComponent(username)}`;
+                const params = new URLSearchParams(window.location.search);
+                const studioType = params.get('studio') || 'mini'; 
+                // Добавь &studio=${studioType} в твой fetch запрос к n8n
+                const url = `https://n8ndex.ru/webhook-test/calendar?date=${dateStr}&studio=${studioType}&userId=${userId}&username=${encodeURIComponent(username)}`;
                 
                 const response = await fetch(url);
                 const data = await response.json();
