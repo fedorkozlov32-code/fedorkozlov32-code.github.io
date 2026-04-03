@@ -270,10 +270,28 @@
                 el.classList.add('past');
             } else {
                 if (selectedFullDate && dateObj.getTime() === selectedFullDate.getTime()) el.classList.add('selected');
-                el.onclick = () => {
+                // Внутри el.onclick для дня в календаре
+                el.onclick = async () => {
                     selectedFullDate = dateObj;
-                    renderCalendar();
-                    document.getElementById('btn-to-time').classList.add('active');
+                    const formattedDate = dateObj.toISOString().split('T')[0];
+                    
+                    // Показываем лоадер, пока ждем ответа от n8n
+                    tg.MainButton.showProgress(); 
+                    
+                    try {
+                        const response = await fetch(`https://n8ndex.ru/webhook/get-busy-slots?date=${formattedDate}`);
+                        const busySlots = await response.json(); // Приходит массив типа [10, 11, 14]
+                        
+                        // Сохраняем занятые слоты глобально, чтобы renderTimeSlots их видел
+                        window.busySlotsFromServer = busySlots; 
+                        
+                        renderCalendar();
+                        document.getElementById('btn-to-time').classList.add('active');
+                    } catch (e) {
+                        tg.showAlert("Ошибка при получении свободных слотов");
+                    } finally {
+                        tg.MainButton.hideProgress();
+                    }
                 };
             }
             grid.appendChild(el);
