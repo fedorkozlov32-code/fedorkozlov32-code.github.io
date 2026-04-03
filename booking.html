@@ -256,14 +256,38 @@
             const dateStr = `${year}-${month}-${day}`;
 
             try {
+                // 1. Запрашиваем данные (n8n пришлет JSON)
                 const response = await fetch(`https://n8ndex.ru/webhook-test/calendar?date=${dateStr}`);
-                const rawData = await response.text();
+                const data = await response.json(); // Используем .json(), так как n8n отдает объект
                 
-                if (rawData && rawData.trim().length > 0) {
-                    window.busySlots = rawData.split(',').map(slot => parseInt(slot.trim().split(':')[0]));
+                console.log("Получен объект от n8n:", data);
+                
+                // 2. Достаем строку из ключа busyHoursList (как на твоем скриншоте)
+                const rawString = data.busyHoursList || "";
+                
+                // 3. Превращаем строку "00:00, 01:00" в массив чисел [0, 1]
+                if (rawString.trim().length > 0) {
+                    window.busySlots = rawString.split(',').map(slot => {
+                        return parseInt(slot.trim().split(':')[0]); 
+                    });
                 } else {
                     window.busySlots = [];
                 }
+                
+                console.log("Итоговые занятые индексы:", window.busySlots);
+    
+                // Переключение интерфейса
+                document.getElementById('step-date').classList.add('hidden');
+                document.getElementById('step-time').classList.remove('hidden');
+                document.getElementById('selected-date-title').innerText = `${selectedFullDate.getDate()} ${monthNamesGenitive[selectedFullDate.getMonth()]} ${selectedFullDate.getFullYear()}`;
+                
+                renderTimeSlots();
+            } catch (e) {
+                console.error("Ошибка при обработке ответа n8n:", e);
+                tg.showAlert("Не удалось проверить доступное время.");
+            } finally {
+                btn.classList.remove('loading');
+            }
                 
                 document.getElementById('step-date').classList.add('hidden');
                 document.getElementById('step-time').classList.remove('hidden');
