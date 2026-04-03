@@ -60,6 +60,29 @@
             font-size: 17px;
         }
 
+        .back-to-main {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: opacity 0.2s;
+            padding: 5px 0;
+        }
+
+        .back-to-main span {
+            font-size: 24px;
+            line-height: 0;
+            margin-top: -2px;
+        }
+
+        .back-to-main:active {
+            opacity: 0.6;
+        }
+
         /* --- ИСПРАВЛЕННЫЙ БЛОК ДЛЯ СТРЕЛОЧЕК --- */
         .nav-arrow { 
             width: 32px;
@@ -164,6 +187,10 @@
 <body>
 
 <div class="container">
+    <div class="back-to-main" onclick="location.href='index.html'">
+        <span>‹</span> На главную
+    </div>
+
     <div id="step-date">
         <h1>Когда запишемся?</h1>
         <div class="card">
