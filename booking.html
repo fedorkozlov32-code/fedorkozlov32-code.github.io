@@ -341,7 +341,8 @@
             user: tg.initDataUnsafe.user,
             date: `${year}-${month}-${day}`,
             slots: selectedSlots,
-            duration: selectedSlots.length
+            duration: selectedSlots.length,
+            studio: studioType
         };
         try {
             const response = await fetch('https://n8ndex.ru/webhook-test/4b890fd5-6b71-480b-9c18-60eb4d5a9138', {
