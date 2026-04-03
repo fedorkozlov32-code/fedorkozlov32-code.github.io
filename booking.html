@@ -60,6 +60,16 @@
             font-size: 17px;
         }
 
+        .time-slot.booked {
+            background: #f0f0f0;
+            color: #ccc;
+            cursor: not-allowed;
+            border: 1px dashed #ddd;
+            box-shadow: none;
+        }
+        
+.time-slot.booked:active { transform: none; }
+
         .back-to-main {
             display: inline-flex;
             align-items: center;
@@ -270,28 +280,10 @@
                 el.classList.add('past');
             } else {
                 if (selectedFullDate && dateObj.getTime() === selectedFullDate.getTime()) el.classList.add('selected');
-                // Внутри el.onclick для дня в календаре
-                el.onclick = async () => {
+                el.onclick = () => {
                     selectedFullDate = dateObj;
-                    const formattedDate = dateObj.toISOString().split('T')[0];
-                    
-                    // Показываем лоадер, пока ждем ответа от n8n
-                    tg.MainButton.showProgress(); 
-                    
-                    try {
-                        const response = await fetch(`https://n8ndex.ru/webhook-test/calendar?date=${formattedDate}`);
-                        const busySlots = await response.json(); // Приходит массив типа [10, 11, 14]
-                        
-                        // Сохраняем занятые слоты глобально, чтобы renderTimeSlots их видел
-                        window.busySlotsFromServer = busySlots; 
-                        
-                        renderCalendar();
-                        document.getElementById('btn-to-time').classList.add('active');
-                    } catch (e) {
-                        tg.showAlert("Ошибка при получении свободных слотов");
-                    } finally {
-                        tg.MainButton.hideProgress();
-                    }
+                    renderCalendar();
+                    document.getElementById('btn-to-time').classList.add('active');
                 };
             }
             grid.appendChild(el);
@@ -360,17 +352,39 @@
         });
     }
 
-    function showStep(step) {
-        if (step === 2) {
+    async function showStep(step) {
+    if (step === 2) {
+        const btn = document.getElementById('btn-to-time');
+        btn.classList.add('loading'); // Добавляем спиннер на кнопку "Далее"
+        
+        const year = selectedFullDate.getFullYear();
+        const month = String(selectedFullDate.getMonth() + 1).padStart(2, '0');
+        const day = String(selectedFullDate.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+
+        try {
+            // Запрашиваем занятые слоты у n8n
+            const response = await fetch(`https://n8ndex.ru/webhook-test/calendar?date=${dateStr}`);
+            const data = await response.json();
+            
+            // Сохраняем во временную переменную
+            window.busySlots = data.busySlots || []; 
+
             document.getElementById('step-date').classList.add('hidden');
             document.getElementById('step-time').classList.remove('hidden');
             document.getElementById('selected-date-title').innerText = `${selectedFullDate.getDate()} ${monthNamesGenitive[selectedFullDate.getMonth()]}`;
+            
             renderTimeSlots();
-        } else {
-            document.getElementById('step-time').classList.add('hidden');
-            document.getElementById('step-date').classList.remove('hidden');
+        } catch (e) {
+            tg.showAlert("Не удалось проверить доступное время. Попробуйте позже.");
+        } finally {
+            btn.classList.remove('loading');
         }
+    } else {
+        document.getElementById('step-time').classList.add('hidden');
+        document.getElementById('step-date').classList.remove('hidden');
     }
+}
     
     function changeMonth(dir) {
         currentViewDate.setMonth(currentViewDate.getMonth() + dir);
