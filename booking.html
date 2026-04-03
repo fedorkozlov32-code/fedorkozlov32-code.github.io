@@ -66,14 +66,13 @@
 
         .next-btn { margin-top: 30px; width: 100%; padding: 20px; border-radius: 24px; border: none; background: var(--disabled-bg); color: var(--disabled-text); font-size: 17px; font-weight: 700; transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); position: relative; }
         .next-btn.active { background: var(--primary-color); color: white; box-shadow: 0 10px 25px rgba(47, 92, 255, 0.2); cursor: pointer; }
-        .next-btn:active { transform: scale(0.97); }
-
-        .hidden { display: none; }
-
+        
         .spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; position: absolute; left: 50%; top: 50%; margin: -10px 0 0 -10px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading span { opacity: 0; }
         .loading .spinner { display: block; }
+
+        .hidden { display: none; }
     </style> 
 </head>
 <body>
@@ -92,7 +91,10 @@
                 <div class="nav-arrow" onclick="changeMonth(1)">›</div>
             </div>
             <div class="days-grid" id="calendar-days"></div>
-            <button id="btn-to-time" class="next-btn"><span>Выбрать время</span><div class="spinner"></div></button>
+            <button id="btn-to-time" class="next-btn">
+                <span>Выбрать время</span>
+                <div class="spinner"></div>
+            </button>
         </div>
     </div>
 
@@ -100,7 +102,7 @@
         <h1>Свободные часы</h1>
         <div class="card">
             <div class="calendar-header">
-                <div class="nav-arrow" onclick="showStep(1)">‹</div>
+                <div class="nav-arrow" onclick="showStep(1)">✕</div>
                 <span id="selected-date-title"></span>
                 <div style="width:32px"></div>
             </div>
@@ -256,46 +258,23 @@
             const dateStr = `${year}-${month}-${day}`;
 
             try {
-                // 1. Запрашиваем данные (n8n пришлет JSON)
                 const response = await fetch(`https://n8ndex.ru/webhook-test/calendar?date=${dateStr}`);
-                const data = await response.json(); // Используем .json(), так как n8n отдает объект
+                const data = await response.json();
                 
-                console.log("Получен объект от n8n:", data);
-                
-                // 2. Достаем строку из ключа busyHoursList (как на твоем скриншоте)
                 const rawString = data.busyHoursList || "";
-                
-                // 3. Превращаем строку "00:00, 01:00" в массив чисел [0, 1]
                 if (rawString.trim().length > 0) {
-                    window.busySlots = rawString.split(',').map(slot => {
-                        return parseInt(slot.trim().split(':')[0]); 
-                    });
+                    window.busySlots = rawString.split(',').map(slot => parseInt(slot.trim().split(':')[0]));
                 } else {
                     window.busySlots = [];
                 }
-                
-                console.log("Итоговые занятые индексы:", window.busySlots);
-    
-                // Переключение интерфейса
-                document.getElementById('step-date').classList.add('hidden');
-                document.getElementById('step-time').classList.remove('hidden');
-                document.getElementById('selected-date-title').innerText = `${selectedFullDate.getDate()} ${monthNamesGenitive[selectedFullDate.getMonth()]} ${selectedFullDate.getFullYear()}`;
-                
-                renderTimeSlots();
-            } catch (e) {
-                console.error("Ошибка при обработке ответа n8n:", e);
-                tg.showAlert("Не удалось проверить доступное время.");
-            } finally {
-                btn.classList.remove('loading');
-            }
-                
+
                 document.getElementById('step-date').classList.add('hidden');
                 document.getElementById('step-time').classList.remove('hidden');
                 document.getElementById('selected-date-title').innerText = `${selectedFullDate.getDate()} ${monthNamesGenitive[selectedFullDate.getMonth()]}`;
                 
                 renderTimeSlots();
             } catch (e) {
-                tg.showAlert("Ошибка проверки времени.");
+                tg.showAlert("Не удалось проверить свободное время.");
             } finally {
                 btn.classList.remove('loading');
             }
