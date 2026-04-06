@@ -157,8 +157,12 @@
     tg.expand();
 
     function selectStudio(type) {
-        // Передаем тип студии в URL для booking.html
-        location.href = `booking.html?studio=${type}`;
+        // Сохраняем тип студии в память браузера под ключом 'selectedStudio'
+        localStorage.setItem('selectedStudio', type);
+        
+        // Переходим на страницу бронирования уже с "чистым" URL
+        location.href = 'booking.html';
+    }
     }
 </script>
 </body>
