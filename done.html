@@ -177,6 +177,7 @@
         const finalData = {
             user: tg.initDataUnsafe.user,
             studio: studio,
+            rawDate: localStorage.getItem('selectedDateRaw'),
             date: date,
             slots: slots,
             totalPrice: slots.length * PRICES[studio]
