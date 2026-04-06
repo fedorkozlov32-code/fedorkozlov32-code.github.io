@@ -154,9 +154,21 @@
 
         // 3. Отображаем время (интервал от первого до последнего слота)
         if (slots.length > 0) {
-            const startHour = Math.min(...slots);
-            const endHour = Math.max(...slots) + 1;
-            document.getElementById('res-time').innerText = `${startHour}:00 — ${endHour}:00`;
+            // Сортируем слоты на всякий случай
+            slots.sort((a, b) => a - b);
+            
+            const startRaw = slots[0];
+            const endRaw = slots[slots.length - 1] + 1;
+
+            // Превращаем 24, 25, 26... в 00, 01, 02...
+            const startHour = startRaw % 24;
+            const endHour = endRaw % 24;
+
+            // Форматируем, чтобы всегда было две цифры (03:00 вместо 3:00)
+            const startTimeStr = String(startHour).padStart(2, '0') + ':00';
+            const endTimeStr = String(endHour).padStart(2, '0') + ':00';
+
+            document.getElementById('res-time').innerText = `${startTimeStr} — ${endTimeStr}`;
             
             // 4. Считаем стоимость
             const total = slots.length * PRICES[studio];
