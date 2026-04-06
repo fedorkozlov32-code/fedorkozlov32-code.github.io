@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Успешно</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --primary-color: #2F5CFF;
+            --bg-color: #ffffff;
+            --success-color: #28a745;
+            --text-color: #000000;
+            --secondary-text: #888888;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .success-card {
+            max-width: 320px;
+            animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* Анимированная иконка галочки */
+        .icon-wrapper {
+            width: 100px;
+            height: 100px;
+            background: #F0F4FF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .checkmark {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 3;
+            stroke: var(--primary-color);
+            stroke-miterlimit: 10;
+            box-shadow: inset 0px 0px 0px var(--primary-color);
+            animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+        }
+
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+        }
+
+        @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+        @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+        @keyframes slideUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        p {
+            font-size: 16px;
+            color: var(--secondary-text);
+            line-height: 1.5;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        .close-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 10px 25px rgba(47, 92, 255, 0.2);
+        }
+
+        .close-btn:active {
+            transform: scale(0.96);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="success-card">
+    <div class="icon-wrapper">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+    </div>
+    <h1>Готово!</h1>
+    <p>Время успешно забронировано. Вернитесь в бота для завершения оплаты.</p>
+    <button class="close-btn" onclick="tgClose()">Вернуться в чат</button>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function tgClose() {
+        tg.close();
+    }
+
+    // Автоматическое закрытие через 5 секунд (опционально)
+    // setTimeout(() => { tg.close(); }, 5000);
+</script>
+
+</body>
+</html>
