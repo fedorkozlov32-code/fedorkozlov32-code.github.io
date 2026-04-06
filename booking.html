@@ -343,13 +343,36 @@
         const year = selectedFullDate.getFullYear();
         const dateText = `${day} ${month} ${year}`;
 
-        const monthNum = String(selectedFullDate.getMonth() + 1).padStart(2, '0');
-        const dayNum = String(selectedFullDate.getDate()).padStart(2, '0');
-        const rawDate = `${year}-${monthNum}-${dayNum}`;
+        selectedSlots.sort((a, b) => a - b);
+    
+        const startHour = selectedSlots[0];
+        const endHour = selectedSlots[selectedSlots.length - 1] + 1;
+    
+        // Функция для создания ISO-подобной строки: 2026-04-16T10:00
+        const formatRaw = (date, hour) => {
+            const d = new Date(date);
+            // Если час 24 и более (ночной слот), добавляем день
+            if (hour >= 24) {
+                d.setDate(d.getDate() + 1);
+                hour = hour % 24;
+            }
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const hh = String(hour).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}T${hh}:00`;
+        };
+    
+        const rawDateStart = formatRaw(selectedFullDate, startHour);
+        const rawDateEnd = formatRaw(selectedFullDate, endHour);
+
+        // Сохраняем для страницы подтверждения и n8n
+        localStorage.setItem('rawDateStart', rawDateStart);
+        localStorage.setItem('rawDateEnd', rawDateEnd);
     
         // 2. Сохраняем в localStorage под правильными ключами
         localStorage.setItem('selectedDate', dateText); // Сохраняем текст для отображения
-        localStorage.setItem('selectedDateRaw', rawDate);
+        // localStorage.setItem('selectedDateRaw', rawDate);
         localStorage.setItem('selectedSlots', JSON.stringify(selectedSlots)); // Сохраняем массив слотов
         
         // 3. Переходим
