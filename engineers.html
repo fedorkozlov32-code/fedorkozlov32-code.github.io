@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Выбор звукоинженера</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --primary-color: #2F5CFF;
+            --bg-color: #ffffff;
+            --secondary-bg: #F5F7FF;
+            --text-color: #000000;
+            --gray-light: #f5f5f7;
+            --card-shadow: 0 15px 30px rgba(0,0,0,0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container { width: 100%; max-width: 450px; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-color);
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .back-btn span { font-size: 24px; margin-right: 4px; }
+
+        h1 { font-size: 34px; font-weight: 800; line-height: 1.1; margin: 20px 0 30px 0; letter-spacing: -1.2px; }
+
+        /* Сетка в две колонки */
+        .engineers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .eng-card {
+            background: #fff;
+            border-radius: 24px;
+            padding: 12px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .eng-card:active { transform: scale(0.95); background: var(--secondary-bg); }
+
+        .eng-photo {
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Квадратное фото */
+            border-radius: 18px;
+            object-fit: cover;
+            background-color: var(--gray-light);
+            margin-bottom: 12px;
+        }
+
+        .eng-name {
+            font-size: 16px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.4px;
+        }
+
+        .eng-nickname {
+            font-size: 12px;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="back-btn" onclick="history.back()">
+        <span>‹</span> Назад
+    </div>
+
+    <h1>Кто будет <br>сводить?</h1>
+
+    <div class="engineers-grid">
+        <div class="eng-card" onclick="selectEngineer('Misha Omni')">
+            <img src="img/eng_misha.jpg" alt="Misha" class="eng-photo">
+            <p class="eng-name">Миша</p>
+            <p class="eng-nickname">OMNI</p>
+        </div>
+
+        <div class="eng-card" onclick="selectEngineer('Vanya 1side')">
+            <img src="img/eng_vanya.jpg" alt="Vanya" class="eng-photo">
+            <p class="eng-name">Ваня</p>
+            <p class="eng-nickname">1SIDE</p>
+        </div>
+
+        <div class="eng-card" onclick="selectEngineer('Serega Slitee')">
+            <img src="img/eng_serega.jpg" alt="Serega" class="eng-photo">
+            <p class="eng-name">Серега</p>
+            <p class="eng-nickname">SLITEE</p>
+        </div>
+
+        <div class="eng-card" onclick="selectEngineer('Matvey Maite')">
+            <img src="img/eng_matvey.jpg" alt="Matvey" class="eng-photo">
+            <p class="eng-name">Матвей</p>
+            <p class="eng-nickname">MAITE</p>
+        </div>
+
+        <div class="eng-card" onclick="selectEngineer('Stepa Vivienne')">
+            <img src="img/eng_stepa.jpg" alt="Stepa" class="eng-photo">
+            <p class="eng-name">Степа</p>
+            <p class="eng-nickname">VIVIENNE</p>
+        </div>
+
+        <div class="eng-card" onclick="selectEngineer('Vlad Sonic')">
+            <img src="img/eng_vlad.jpg" alt="Vlad" class="eng-photo">
+            <p class="eng-name">Влад</p>
+            <p class="eng-nickname">SONIC</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function selectEngineer(name) {
+        // Сохраняем имя в память
+        localStorage.setItem('selectedEngineer', name);
+        // Переходим к выбору даты/времени
+        location.href = 'booking.html';
+    }
+</script>
+</body>
+</html>
