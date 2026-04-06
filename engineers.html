@@ -6,16 +6,17 @@
     <title>Выбор звукоинженера</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
             --primary-color: #2F5CFF;
             --bg-color: #ffffff;
-            --secondary-bg: #F5F7FF;
-            --text-color: #000000;
-            --gray-light: #f5f5f7;
-            --card-shadow: 0 15px 30px rgba(0,0,0,0.05);
+            --secondary-bg: #F8FAFF;
+            --text-main: #000000;
+            --text-secondary: #8E8E93;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --accent-gradient: linear-gradient(135deg, #2F5CFF 0%, #6E8EFF 100%);
         }
 
         body {
@@ -23,120 +24,204 @@
             background-color: var(--bg-color);
             margin: 0;
             padding: 20px;
-            color: var(--text-color);
+            color: var(--text-main);
             display: flex;
             justify-content: center;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .container { width: 100%; max-width: 450px; animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .container { width: 100%; max-width: 450px; animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .header-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
 
         .back-btn {
-            display: inline-flex;
-            align-items: center;
+            font-weight: 700;
             color: var(--primary-color);
-            font-weight: 600;
+            background: var(--secondary-bg);
+            padding: 8px 16px;
+            border-radius: 12px;
             cursor: pointer;
-            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
         }
-        .back-btn span { font-size: 24px; margin-right: 4px; }
 
-        h1 { font-size: 34px; font-weight: 800; line-height: 1.1; margin: 20px 0 30px 0; letter-spacing: -1.2px; }
+        h1 { font-size: 36px; font-weight: 900; line-height: 1.05; margin: 0 0 35px 0; letter-spacing: -1.8px; }
 
-        /* Сетка в две колонки */
         .engineers-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
+            gap: 18px;
         }
 
         .eng-card {
             background: #fff;
-            border-radius: 24px;
-            padding: 12px;
+            border-radius: 28px;
+            position: relative;
+            padding: 10px;
             box-shadow: var(--card-shadow);
-            border: 1px solid #f0f0f0;
+            border: 1px solid #F0F0F0;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .eng-card:active { transform: scale(0.95); background: var(--secondary-bg); }
+        .eng-card:active { transform: scale(0.94); }
 
-        .eng-photo {
+        .img-container {
+            position: relative;
             width: 100%;
-            aspect-ratio: 1 / 1; /* Квадратное фото */
-            border-radius: 18px;
-            object-fit: cover;
-            background-color: var(--gray-light);
+            aspect-ratio: 1/1;
+            border-radius: 20px;
+            overflow: hidden;
             margin-bottom: 12px;
         }
 
+        .eng-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        /* Цена поверх фото в стиле Glassmorphism */
+        .price-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .eng-info {
+            padding: 0 6px 8px 6px;
+        }
+
         .eng-name {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 800;
             margin: 0;
-            letter-spacing: -0.4px;
+            letter-spacing: -0.5px;
         }
 
         .eng-nickname {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--primary-color);
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 1px;
             margin-top: 2px;
-            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        /* Маркер "Топ" для Миши */
+        .featured-tag {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--accent-gradient);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            z-index: 2;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="back-btn" onclick="history.back()">
-        <span>‹</span> Назад
+    <div class="header-nav">
+        <div class="back-btn" onclick="location.href='index.html'">
+            <span>‹</span> Назад
+        </div>
     </div>
 
-    <h1>Кто будет <br>сводить?</h1>
+    <h1>Твой звук в <br>надежных руках</h1>
 
     <div class="engineers-grid">
-        <div class="eng-card" onclick="selectEngineer('Misha Omni')">
-            <img src="img/eng_misha.jpg" alt="Misha" class="eng-photo">
-            <p class="eng-name">Миша</p>
-            <p class="eng-nickname">OMNI</p>
+        <div class="eng-card" onclick="selectEngineer('Misha Omni', 3500)">
+            <div class="featured-tag">Pro</div>
+            <div class="img-container">
+                <img src="img/eng_misha.jpg" alt="Misha" class="eng-photo">
+                <div class="price-badge">3500₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Миша</p>
+                <p class="eng-nickname">OMNI</p>
+            </div>
         </div>
 
-        <div class="eng-card" onclick="selectEngineer('Vanya 1side')">
-            <img src="img/eng_vanya.jpg" alt="Vanya" class="eng-photo">
-            <p class="eng-name">Ваня</p>
-            <p class="eng-nickname">1SIDE</p>
+        <div class="eng-card" onclick="selectEngineer('Vanya 1side', 2500)">
+            <div class="img-container">
+                <img src="img/eng_vanya.jpg" alt="Vanya" class="eng-photo">
+                <div class="price-badge">2500₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Ваня</p>
+                <p class="eng-nickname">1SIDE</p>
+            </div>
         </div>
 
-        <div class="eng-card" onclick="selectEngineer('Serega Slitee')">
-            <img src="img/eng_serega.jpg" alt="Serega" class="eng-photo">
-            <p class="eng-name">Серега</p>
-            <p class="eng-nickname">SLITEE</p>
+        <div class="eng-card" onclick="selectEngineer('Serega Slitee', 2000)">
+            <div class="img-container">
+                <img src="img/eng_serega.jpg" alt="Serega" class="eng-photo">
+                <div class="price-badge">2000₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Серега</p>
+                <p class="eng-nickname">SLITEE</p>
+            </div>
         </div>
 
-        <div class="eng-card" onclick="selectEngineer('Matvey Maite')">
-            <img src="img/eng_matvey.jpg" alt="Matvey" class="eng-photo">
-            <p class="eng-name">Матвей</p>
-            <p class="eng-nickname">MAITE</p>
+        <div class="eng-card" onclick="selectEngineer('Matvey Maite', 2000)">
+            <div class="img-container">
+                <img src="img/eng_matvey.jpg" alt="Matvey" class="eng-photo">
+                <div class="price-badge">2000₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Матвей</p>
+                <p class="eng-nickname">MAITE</p>
+            </div>
         </div>
 
-        <div class="eng-card" onclick="selectEngineer('Stepa Vivienne')">
-            <img src="img/eng_stepa.jpg" alt="Stepa" class="eng-photo">
-            <p class="eng-name">Степа</p>
-            <p class="eng-nickname">VIVIENNE</p>
+        <div class="eng-card" onclick="selectEngineer('Stepa Vivienne', 2500)">
+            <div class="img-container">
+                <img src="img/eng_stepa.jpg" alt="Stepa" class="eng-photo">
+                <div class="price-badge">2500₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Степа</p>
+                <p class="eng-nickname">VIVIENNE</p>
+            </div>
         </div>
 
-        <div class="eng-card" onclick="selectEngineer('Vlad Sonic')">
-            <img src="img/eng_vlad.jpg" alt="Vlad" class="eng-photo">
-            <p class="eng-name">Влад</p>
-            <p class="eng-nickname">SONIC</p>
+        <div class="eng-card" onclick="selectEngineer('Vlad Sonic', 2000)">
+            <div class="img-container">
+                <img src="img/eng_vlad.jpg" alt="Vlad" class="eng-photo">
+                <div class="price-badge">2000₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Влад</p>
+                <p class="eng-nickname">SONIC</p>
+            </div>
         </div>
     </div>
 </div>
@@ -145,11 +230,13 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    function selectEngineer(name) {
-        // Сохраняем имя в память
+    function selectEngineer(name, price) {
+        // Сохраняем имя и персональную ставку инженера
         localStorage.setItem('selectedEngineer', name);
-        // Переходим к выбору даты/времени
-        location.href = 'booking.html';
+        localStorage.setItem('engineerPrice', price);
+        
+        // Переходим к выбору студии
+        location.href = 'studio.html';
     }
 </script>
 </body>
