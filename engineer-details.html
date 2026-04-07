@@ -12,11 +12,9 @@
         :root {
             --primary: #2F5CFF;
             --bg: #ffffff;
-            --secondary-bg: #F2F5FF;
             --text-main: #000000;
-            --text-gray: #636366;
-            --accent-gradient: linear-gradient(135deg, #2F5CFF 0%, #6E8EFF 100%);
-            --card-radius: 24px;
+            --text-gray: #8E8E93;
+            --line-color: #EFEFEF;
         }
 
         body {
@@ -24,15 +22,13 @@
             margin: 0;
             background: var(--bg);
             color: var(--text-main);
-            padding-bottom: 120px; /* Место под кнопку */
+            padding-bottom: 120px;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Hero секция с фото */
         .hero {
-            position: relative;
             width: 100%;
-            height: 400px;
+            height: 380px;
             overflow: hidden;
         }
 
@@ -42,272 +38,235 @@
             object-fit: cover;
         }
 
-        .hero-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 150px;
-            background: linear-gradient(to top, var(--bg), transparent);
-        }
-
-        /* Контент */
         .content {
-            padding: 0 20px;
-            margin-top: -40px;
-            position: relative;
-            z-index: 2;
+            padding: 30px 20px;
         }
 
-        .badge {
-            display: inline-block;
-            background: var(--accent-gradient);
-            color: white;
-            padding: 6px 14px;
-            border-radius: 100px;
+        h1 { font-size: 44px; font-weight: 900; margin: 0; letter-spacing: -2px; line-height: 1; }
+        .nickname { font-size: 20px; font-weight: 700; color: var(--text-gray); margin-bottom: 30px; display: block; text-transform: uppercase; }
+
+        /* Верхние статы */
+        .stats-row {
+            display: flex;
+            border-top: 1px solid var(--line-color);
+            border-bottom: 1px solid var(--line-color);
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            flex: 1;
+            padding: 20px 0;
+            text-align: left;
+        }
+        .stat-item:first-child { border-right: 1px solid var(--line-color); }
+        .stat-item:last-child { padding-left: 20px; }
+        
+        .stat-label { font-size: 11px; color: var(--text-gray); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; }
+        .stat-value { font-weight: 800; font-size: 18px; color: var(--text-main); }
+
+        /* Секции текста */
+        .info-section {
+            padding: 25px 0;
+            border-bottom: 1px solid var(--line-color);
+        }
+        .info-section.hidden { display: none; }
+        
+        .section-label {
             font-size: 12px;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-        }
-
-        h1 { font-size: 42px; font-weight: 900; margin: 0; letter-spacing: -2px; line-height: 1; }
-        .nickname { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 25px; display: block; }
-
-        /* Блоки с инфой */
-        .section-title {
-            font-size: 14px;
-            font-weight: 800;
-            text-transform: uppercase;
             color: var(--text-gray);
-            letter-spacing: 1px;
-            margin: 30px 0 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .info-card {
-            background: var(--secondary-bg);
-            border-radius: var(--card-radius);
-            padding: 20px;
+            letter-spacing: 1.5px;
             margin-bottom: 15px;
+            display: block;
         }
 
-        .worked-with { font-weight: 600; font-size: 15px; line-height: 1.5; color: #333; }
-        .desc-text { font-size: 16px; line-height: 1.6; color: #444; }
-
-        /* Сетка статов */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+        .section-content {
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 500;
+            color: var(--text-main);
+            white-space: pre-line; /* Чтобы сохранялись переносы строк */
         }
-        .stat-box {
-            background: #fff;
-            border: 1px solid #E5E9F2;
-            padding: 16px;
-            border-radius: 20px;
-        }
-        .stat-label { font-size: 11px; color: var(--text-gray); font-weight: 600; display: block; margin-bottom: 4px; }
-        .stat-value { font-weight: 800; font-size: 16px; color: var(--primary); }
 
         /* Прайс лист */
-        .price-item {
+        .price-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 12px 0;
+            font-size: 16px;
         }
-        .price-item:last-child { border-bottom: none; }
-        .price-name { font-weight: 600; font-size: 15px; }
-        .price-value { font-weight: 800; color: var(--primary); }
+        .price-name { font-weight: 600; color: #444; }
+        .price-val { font-weight: 800; }
 
-        /* Кнопки снизу */
-        .footer-actions {
+        /* Кнопки */
+        .footer {
             position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             padding: 20px;
-            background: rgba(255,255,255,0.9);
-            backdrop-filter: blur(15px);
-            display: flex;
-            gap: 12px;
-            z-index: 100;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            display: flex; gap: 12px;
+            border-top: 1px solid var(--line-color);
         }
 
         .btn {
-            height: 64px;
-            border-radius: 22px;
+            height: 60px;
+            border-radius: 18px;
             border: none;
             font-weight: 800;
-            font-size: 17px;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
-
-        .btn-confirm {
-            flex: 1;
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 10px 20px rgba(47, 92, 255, 0.2);
-        }
-        .btn-back {
-            width: 64px;
-            background: #F0F0F0;
-            color: black;
-        }
-        .btn:active { transform: scale(0.96); }
-
+        .btn-confirm { flex: 1; background: var(--primary); color: white; }
+        .btn-back { width: 60px; background: #F2F2F7; color: black; }
     </style>
 </head>
 <body>
 
-<div id="app">
-    <div class="hero">
-        <img id="eng-pic" src="" alt="Photo">
-        <div class="hero-overlay"></div>
+<div id="hero" class="hero">
+    <img id="eng-pic" src="" alt="">
+</div>
+
+<div class="content">
+    <h1 id="eng-name">—</h1>
+    <span id="eng-nick" class="nickname">—</span>
+
+    <div class="stats-row">
+        <div class="stat-item">
+            <span class="stat-label">Опыт</span>
+            <span class="stat-value" id="eng-exp">—</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Цена за час</span>
+            <span class="stat-value" id="eng-price-hour">—</span>
+        </div>
     </div>
 
-    <div class="content">
-        <div class="badge">Omni Team</div>
-        <h1 id="eng-name">—</h1>
-        <span id="eng-nick" class="nickname">—</span>
-
-        <div class="stats-grid">
-            <div class="stat-box">
-                <span class="stat-label">ОПЫТ</span>
-                <span class="stat-value" id="eng-exp">—</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-label">СОФТ</span>
-                <span class="stat-value" id="eng-soft">—</span>
-            </div>
-        </div>
-
-        <div class="section-title">🚀 Работал с</div>
-        <div class="info-card">
-            <div class="worked-with" id="eng-clients">—</div>
-        </div>
-
-        <div class="section-title">💡 О себе</div>
-        <div class="info-card">
-            <div class="desc-text" id="eng-about">—</div>
-        </div>
-
-        <div class="section-title">🧾 Прайс-лист</div>
-        <div class="info-card" id="price-list">
-            </div>
+    <div id="sec-clients" class="info-section">
+        <span class="section-label">Работал с исполнителями</span>
+        <div class="section-content" id="eng-clients"></div>
     </div>
 
-    <div class="footer-actions">
-        <button class="btn btn-back" onclick="history.back()">‹</button>
-        <button class="btn btn-confirm" onclick="confirmSelection()">Выбрать инженера</button>
+    <div id="sec-about" class="info-section">
+        <span class="section-label">О себе</span>
+        <div class="section-content" id="eng-about"></div>
+    </div>
+
+    <div id="sec-prices" class="info-section">
+        <span class="section-label">Прайс-лист</span>
+        <div id="price-list"></div>
     </div>
 </div>
 
-<script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+<div class="footer">
+    <button class="btn btn-back" onclick="history.back()">‹</button>
+    <button class="btn btn-confirm" onclick="confirmSelection()">Выбрать инженера</button>
+</div>
 
+<script>
     const engineersData = {
         'Misha Omni': {
             img: 'img/eng_misha.jpg',
             exp: '6 лет',
-            soft: 'Logic, FL, Ableton',
-            clients: 'Rakhim, DILARA, SODA LUV, BAELI, xxxmanera, josodo, Nikitsunami, Kinderlil, SEEYASIDE, haijin, блинк, Blessq, Flamebaby...',
-            about: 'Создал Omni Studio. Лучший вариант работы — создать трек с нуля прямо на студии. Запишем живые гитары, синты и вместе придумаем аранжировку. Доведу любую идею до площадок!',
+            priceHour: '5000 ₽',
+            clients: 'Rakhim, DILARA, SODA LUV, BAELI, xxxmanera, josodo, Nikitsunami, Kinderlil, SEEYASIDE, haijin, блинк, Blessq, Flamebaby...\n\nдиджеил на выступлениях: Nkeeei, Bushido Zho, Pinq, Scally Milano, ALISHA, XO TEAM, КлоуКома...',
+            about: 'создал omni studio и вывел маленькую студию звукозаписи на медийный уровень за счёт коллабов с артистами и проектов в тиктоке, ютубе и инсте\n\nопыт работы в музыкальной сфере - 6 лет, опыт в жизни - 24 года\n\nработает в Logic Pro, Fl studio, Ableton Live\n\nлюбимые жанры - melodic trap, emo rap, boom bap, lofi hip-hop и все мелодичные тайпы с живыми инструментами\n\nлучший вариант работы - создать трек с нуля прямо на студии, можем записать живую/электро гитарку или синты и вместе придумать аранжировку\n\nс радостью помогу довести любую твою идею и задумку до готового полноценного проекта, который мы сможем выложить на площадки!',
             prices: [
-                { name: 'Сведение + Мастеринг', val: '15.000 ₽' },
-                { name: 'Бит с нуля (Exclusive)', val: '15.000 ₽' },
-                { name: 'Обучение', val: 'от 5.000 ₽/ч' }
+                { n: 'Сведение + мастеринг трека', v: '15.000' },
+                { n: 'Написание бита с нуля (эксклюзивные права)', v: '15.000' },
+                { n: 'Обучение (сведение / биты)', v: 'от 5000/час' }
             ]
         },
         'Vanya 1side': {
             img: 'img/eng_vanya.jpg',
             exp: '5 лет',
-            soft: 'Logic Pro, FL Studio',
-            clients: 'Платина, Og Buda, Mayot, YUNGWAY, Полка, Maladoy Prince, Shiny Ruby, STOPBAN, Eikko, Redda, Jayx, Yetii...',
-            about: 'Жесткий гик и программист. Крутит плагины не наугад, а как спиннеры. Главное — поймать общий вайб, чтобы сессия прошла легко. Сделаем с душой!',
+            priceHour: '3000 ₽',
+            clients: 'Платина, Og Buda, Mayot, YUNGWAY, Полка, Maladoy Prince, Shiny Ruby, STOPBAN, Eikko, Redda, Jayx, Yetii, Beno, Xalia!, imrubinx...',
+            about: 'жесткий гик и программист, шарит за софт глубже, чем разработчики😭\n\nопыт в звукорежиссуре - 5 лет, опыт делать красиво и не курить - 19 лет\n\nработает в Logic Pro, Fl Studio\n\nмультижанровый мачо, (хотя может быть и ботан...)\n\nкрутит плагины не наугад, а как спиннеры в 2017\n\nглавное — это поймать общий вайб\'ss✨, чтобы сессия прошла легко, а не как на экзамене. сделаем не топорно, а с душой челы!\n\nсамый маленький из всей команды Omni Studio! ребенок отечественного it 🥹',
             prices: [
-                { name: 'Сведение + Мастеринг', val: '7.500 ₽' },
-                { name: 'Бит с нуля (Exclusive)', val: '7.500 ₽' },
-                { name: 'Обучение', val: 'от 3.000 ₽/ч' }
+                { n: 'Сведение + мастеринг трека', v: '7500' },
+                { n: 'Написание бита с нуля (эксклюзивные права)', v: '7500' },
+                { n: 'Обучение (сведение / биты)', v: 'от 3000/час' }
             ]
         },
         'Serega Slitee': {
             img: 'img/eng_serega.jpg',
-            exp: '6 лет',
-            soft: 'Logic, FL, Cubase',
-            clients: 'Playboi Carti, Ken Carson, Homixide Gang, $uicideboy$, Scally Milano, Uglystephan, Xxxmanera, Code80...',
-            about: 'Работал с артистами мировой сцены. Может сделать грязно и нагло или чисто и дорого. Записывает живую гитару. Главный апгрейд — практика и уши.',
+            exp: '4 года',
+            priceHour: '3000 ₽',
+            clients: 'артисты мировой сцены: Playboi Carti, Ken Carson, Homixide Gang, $uicideboy$, Ka$hdami, TyFontaine, Tana\n\nартисты СНГ: Scally Milano, Uglystephan, Xxxmanera, Yeschapskii, Code80 и многими другими',
+            about: 'с 3 лет играл на ударных в музыкальной школе\n\n6 лет создает аранжировки и 4 года сводит треки\n\nв 17 начал работу в концертной звукорежиссуре - не только «в ноуте красиво», но и чтобы зал качал\n\nработает в Logic Pro, FL Studio и Cubase — может зайти в любой проект и не потеряться\n\nвозможность записи живой гитары\n\nмогу сделать грязно и нагло\n\nмогу сделать чисто и дорого\n\nмогу оставить несовершенство, если в нём характер\n\nпроходил топовые курсы по звукорежиссуре, но главный апгрейд - практика и уши',
             prices: [
-                { name: 'Сведение + Мастеринг', val: '7.500 ₽' },
-                { name: 'Бит с нуля (Exclusive)', val: '15.000 ₽' },
-                { name: 'Обучение', val: 'от 3.000 ₽/ч' }
+                { n: 'Сведение + мастеринг трека', v: '7500' },
+                { n: 'Написание бита с нуля (эксклюзивные права)', v: '15000' },
+                { n: 'Обучение (сведение / биты)', v: 'от 3000/час' }
             ]
         },
-        'Matvey Maite': {
+        'Matvey MAITE': {
             img: 'img/eng_matvey.jpg',
-            exp: '10+ лет',
-            soft: 'Ableton, FL, Logic',
-            clients: 'Его эдиты играет каждый уважающий себя диджей в СНГ.',
-            about: 'Саунд-продюсер с огромным опытом. Знает, как связать диджеинг и написание битов. Соберает трек в цельную, конкурентную работу без заумных терминов.',
+            exp: 'Самый взрослый',
+            priceHour: '3000 ₽',
+            clients: '', // Пусто для проверки логики блоков
+            about: 'саунд-продюсер, чьё имя можно увидеть в каждом диджейском плейлисте, а его эдиты играет каждый уважающий себя диджей\n\nработает с современным электронным звучанием\n\nопытный не только в продакшене, но и по паспорту — самый взрослый звукорежиссёр в omni\n\nработает в Ableton, Fl Studio, Logic Pro\n\nпишет ремиксы на известные треки - знает как связать диджеинг и написание битов в твоей карьере\n\nможет научить тебя писать музыку, даже если ты пока пока только скачал FL или Ableton.\n\nлюбой может написать трек — вопрос в том, кто доведёт его до конца\n\nесли вам нужно не просто «свести дорожки», а собрать трек в цельную, конкурентную работу — вы по адресу\n\nработаю без заумных терминов и сухой теории — только рабочие техники, которые сам использую в продакшене',
             prices: [
-                { name: 'Сведение + Мастеринг', val: '7.500 ₽' },
-                { name: 'Бит с нуля (Exclusive)', val: '7.500 ₽' },
-                { name: 'Обучение', val: 'от 3.000 ₽/ч' }
+                { n: 'Сведение + мастеринг трека', v: '7500' },
+                { n: 'Написание бита с нуля (эксклюзивные права)', v: '7500' },
+                { n: 'Обучение (сведение / биты)', v: 'от 3000/час' }
             ]
         },
-        'Stepa Vivienne': {
+        'Stepa vivienne': {
             img: 'img/eng_stepa.jpg',
             exp: '4 года',
-            soft: 'Logic Pro, FL Studio',
+            priceHour: '2500 ₽',
             clients: 'Nikitsunami, Kinderlil, SEEYASIDE, haijin, huzzy b, блинк, Blessq, Flamebaby, Roksii...',
-            about: 'Креативный директор Omni. Проведет по всем этапам: от записи до съемки сниппетов и создания обложки. Знает всё о продвижении и наборе прослушиваний.',
+            about: 'креативный директор omni studio, основная актерская единица медийной жизни студии в тиктоке, и инсте, ведущий развлекательных шоу на ютубе\n\nопыт в звукорежиссуре - 4 года, опыт в поедании хинкалей - 21 год\n\nработает в Logic Pro, Fl studio\n\nработает во всех жанрах и сам является исполнителем\n\nсвой первый сольный релиз на площадках продвигал нестандартными способами, и набрал 100.000 прослушиваний всего за месяц\n\nпроведу тебя по всем этапам создания трека и поделюсь своим личным опытом в записи на студии, съемке сниппетов и клипов, создании обложки',
             prices: [
-                { name: 'Сведение + Мастеринг', val: '7.500 ₽' },
-                { name: 'Консультация', val: 'По запросу' }
+                { n: 'Сведение + мастеринг трека', v: '7500' }
             ]
         },
-        'Vlad Sonic': {
+        'Vlad sonic': {
             img: 'img/eng_vlad.jpg',
-            exp: '11 лет (биты)',
-            soft: 'Logic Pro, FL Studio',
-            clients: 'Aarne, Элджей, LIL KRYSTALLL, Boulevard Depo, WhitePunk, SODA LUV, The Limba, JEEMBO...',
-            about: 'Гик FL Studio, сотрудничал с зарубежными артистами. Мультижанровый мачо: напишет бит с нуля за несколько минут. Работает дистанционно.',
+            exp: '2 года',
+            priceHour: 'Дистанционно',
+            clients: 'Aarne, Элджей, LIL KRYSTALLL, Boulevard Depo, WhitePunk, SODA LUV, BAELI, RAKHIM, The Limba, Ганвест, JEEMBO, huzzy b, Nikitsunami, LIL VAN, Telly Grave, V9, DopeVvs, Мезамер, REDO, Convolk...',
+            about: 'начал делать биты еще в 2014 году, и накопил огромный опыт за это время\n\nопыт в написании инструменталов - 11 лет, опыт в звукорежиссуре - 2 года\n\nработает в Logic Pro, Fl studio\n\nсотрудничал с зарубежными артистами\n\nмультижанровый, может написать бит с нуля за несколько минут\n\nгик фл студио, провел в этой программе больше времени, чем в реальной жизни, жалко часы там не считаются как в доте...\n\nеще одно хобби - люблю делать ремиксы и мешапы на известные треки',
             prices: [
-                { name: 'Бит с нуля (Exclusive)', val: '10.000 ₽' },
-                { name: 'Доработка бита', val: '7.500 ₽' },
-                { name: 'Сведение (Дистанц.)', val: '10.000 ₽' }
+                { n: 'Написание бита с нуля (эксклюзивные права)', v: '10.000' },
+                { n: 'Доработать твой бит', v: '7500' },
+                { n: 'Сведение + мастеринг трека', v: '10.000' }
             ]
         }
     };
 
     function init() {
         const name = localStorage.getItem('temp_eng_name');
-        const engineer = engineersData[name];
+        const eng = engineersData[name];
 
-        if (engineer) {
-            document.getElementById('eng-pic').src = engineer.img;
-            document.getElementById('eng-name').innerText = name.split(' ')[0];
-            document.getElementById('eng-nick').innerText = name.split(' ')[1] || '';
-            document.getElementById('eng-exp').innerText = engineer.exp;
-            document.getElementById('eng-soft').innerText = engineer.soft;
-            document.getElementById('eng-clients').innerText = engineer.clients;
-            document.getElementById('eng-about').innerText = engineer.about;
+        if (!eng) return;
 
-            const priceContainer = document.getElementById('price-list');
-            priceContainer.innerHTML = engineer.prices.map(p => `
-                <div class="price-item">
-                    <span class="price-name">${p.name}</span>
-                    <span class="price-value">${p.val}</span>
-                </div>
-            `).join('');
+        document.getElementById('eng-pic').src = eng.img;
+        document.getElementById('eng-name').innerText = name.split(' ')[0];
+        document.getElementById('eng-nick').innerText = name.split(' ')[1] || '';
+        document.getElementById('eng-exp').innerText = eng.exp;
+        document.getElementById('eng-price-hour').innerText = eng.priceHour;
+
+        // Блок "Работал с"
+        if (eng.clients) {
+            document.getElementById('eng-clients').innerText = eng.clients;
+        } else {
+            document.getElementById('sec-clients').classList.add('hidden');
         }
+
+        // Блок "О себе"
+        document.getElementById('eng-about').innerText = eng.about;
+
+        // Прайс
+        const pList = document.getElementById('price-list');
+        pList.innerHTML = eng.prices.map(p => `
+            <div class="price-row">
+                <span class="price-name">${p.n}</span>
+                <span class="price-val">${p.v}</span>
+            </div>
+        `).join('');
     }
 
     function confirmSelection() {
