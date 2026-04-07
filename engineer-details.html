@@ -133,7 +133,7 @@
 
     <div class="stats-row">
         <div class="stat-item">
-            <span class="stat-label">Опыт</span>
+            <span class="stat-label">ПОпыт</span>
             <span class="stat-value" id="eng-exp">—</span>
         </div>
         <div class="stat-item">
@@ -164,6 +164,9 @@
 </div>
 
 <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
     const engineersData = {
         'Misha Omni': {
             img: 'img/eng_misha.jpg',
@@ -201,11 +204,11 @@
                 { n: 'Обучение (сведение / биты)', v: 'от 3000/час' }
             ]
         },
-        'Matvey MAITE': {
+        'Matvey Maite': { // Исправили ключ
             img: 'img/eng_matvey.jpg',
-            exp: 'Самый взрослый',
+            exp: '10+ лет',
             priceHour: '3000 ₽',
-            clients: '', // Пусто для проверки логики блоков
+            clients: '', 
             about: 'саунд-продюсер, чьё имя можно увидеть в каждом диджейском плейлисте, а его эдиты играет каждый уважающий себя диджей\n\nработает с современным электронным звучанием\n\nопытный не только в продакшене, но и по паспорту — самый взрослый звукорежиссёр в omni\n\nработает в Ableton, Fl Studio, Logic Pro\n\nпишет ремиксы на известные треки - знает как связать диджеинг и написание битов в твоей карьере\n\nможет научить тебя писать музыку, даже если ты пока пока только скачал FL или Ableton.\n\nлюбой может написать трек — вопрос в том, кто доведёт его до конца\n\nесли вам нужно не просто «свести дорожки», а собрать трек в цельную, конкурентную работу — вы по адресу\n\nработаю без заумных терминов и сухой теории — только рабочие техники, которые сам использую в продакшене',
             prices: [
                 { n: 'Сведение + мастеринг трека', v: '7500' },
@@ -213,7 +216,7 @@
                 { n: 'Обучение (сведение / биты)', v: 'от 3000/час' }
             ]
         },
-        'Stepa vivienne': {
+        'Stepa Vivienne': { // Исправили ключ
             img: 'img/eng_stepa.jpg',
             exp: '4 года',
             priceHour: '2500 ₽',
@@ -223,10 +226,10 @@
                 { n: 'Сведение + мастеринг трека', v: '7500' }
             ]
         },
-        'Vlad sonic': {
+        'Vlad Sonic': { // Исправили ключ
             img: 'img/eng_vlad.jpg',
             exp: '2 года',
-            priceHour: 'Дистанционно',
+            priceHour: '10000 ₽',
             clients: 'Aarne, Элджей, LIL KRYSTALLL, Boulevard Depo, WhitePunk, SODA LUV, BAELI, RAKHIM, The Limba, Ганвест, JEEMBO, huzzy b, Nikitsunami, LIL VAN, Telly Grave, V9, DopeVvs, Мезамер, REDO, Convolk...',
             about: 'начал делать биты еще в 2014 году, и накопил огромный опыт за это время\n\nопыт в написании инструменталов - 11 лет, опыт в звукорежиссуре - 2 года\n\nработает в Logic Pro, Fl studio\n\nсотрудничал с зарубежными артистами\n\nмультижанровый, может написать бит с нуля за несколько минут\n\nгик фл студио, провел в этой программе больше времени, чем в реальной жизни, жалко часы там не считаются как в доте...\n\nеще одно хобби - люблю делать ремиксы и мешапы на известные треки',
             prices: [
@@ -241,7 +244,10 @@
         const name = localStorage.getItem('temp_eng_name');
         const eng = engineersData[name];
 
-        if (!eng) return;
+        if (!eng) {
+            console.error("Инженер не найден:", name);
+            return;
+        }
 
         document.getElementById('eng-pic').src = eng.img;
         document.getElementById('eng-name').innerText = name.split(' ')[0];
@@ -249,17 +255,15 @@
         document.getElementById('eng-exp').innerText = eng.exp;
         document.getElementById('eng-price-hour').innerText = eng.priceHour;
 
-        // Блок "Работал с"
-        if (eng.clients) {
+        if (eng.clients && eng.clients.trim() !== '') {
             document.getElementById('eng-clients').innerText = eng.clients;
+            document.getElementById('sec-clients').classList.remove('hidden');
         } else {
             document.getElementById('sec-clients').classList.add('hidden');
         }
 
-        // Блок "О себе"
         document.getElementById('eng-about').innerText = eng.about;
 
-        // Прайс
         const pList = document.getElementById('price-list');
         pList.innerHTML = eng.prices.map(p => `
             <div class="price-row">
