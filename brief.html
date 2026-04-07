@@ -111,7 +111,6 @@
         .btn-next { flex: 1; background: var(--primary); color: white; }
         .btn-back { width: 64px; background: #F2F2F7; color: black; }
 
-        /* Стиль для специальных кнопок */
         #key-option {
             grid-column: span 2;
             border: 2px dashed var(--border);
@@ -140,12 +139,12 @@
         </div>
     </div>
 
-    <span class="section-label">2. Желаемый результат</span>
-    <div class="options-grid">
-        <div class="option-card result-type" onclick="selectSingle(this)">Сингл</div>
-        <div class="option-card result-type" onclick="selectSingle(this)">EP</div>
-        <div class="option-card result-type" onclick="selectSingle(this)">Альбом</div>
-        <div class="option-card result-type" onclick="selectSingle(this)">Другое</div>
+    <span class="section-label">2. Пожелания по времени</span>
+    <div class="options-grid" id="time-preferences-grid">
+        <div class="option-card time-pref" data-value="Как можно скорее" onclick="toggleTimePref(this)">Как можно скорее</div>
+        <div class="option-card time-pref" data-value="На выходных" onclick="toggleTimePref(this)">На выходных</div>
+        <div class="option-card time-pref" data-value="Днем" onclick="toggleTimePref(this, 'day')">Днем</div>
+        <div class="option-card time-pref" data-value="Вечером" onclick="toggleTimePref(this, 'evening')">Вечером</div>
     </div>
 
     <span class="section-label">3. Комментарий</span>
@@ -187,17 +186,27 @@
         });
     }
 
-    function selectSingle(el) {
-        document.querySelectorAll('.result-type').forEach(card => card.classList.remove('active'));
-        el.classList.add('active');
+    // Логика выбора времени с исключением "Днем/Вечером"
+    function toggleTimePref(el, type) {
+        if (type === 'day') {
+            const eveningBtn = document.querySelector('.time-pref[data-value="Вечером"]');
+            if (eveningBtn) eveningBtn.classList.remove('active');
+        } else if (type === 'evening') {
+            const dayBtn = document.querySelector('.time-pref[data-value="Днем"]');
+            if (dayBtn) dayBtn.classList.remove('active');
+        }
+        el.classList.toggle('active');
     }
 
-    // ГЛАВНАЯ ФУНКЦИЯ КНОПКИ
     function saveAndNext() {
-        const allActive = Array.from(document.querySelectorAll('.option-card.active, .task-type-full.active'));
-        const selectedTasks = allActive.map(t => t.getAttribute('data-value') || t.innerText);
+        // Собираем услуги
+        const allActiveTasks = Array.from(document.querySelectorAll('.task-type.active, .task-type-full.active, .option-card.active:not(.time-pref)'));
+        const selectedTasks = allActiveTasks.map(t => t.getAttribute('data-value') || t.innerText);
         
-        const selectedResult = document.querySelector('.result-type.active')?.innerText || 'Не выбрано';
+        // Собираем пожелания по времени
+        const selectedTimePrefs = Array.from(document.querySelectorAll('.time-pref.active'))
+                                       .map(t => t.getAttribute('data-value'));
+        
         const comment = document.getElementById('user-comment').value;
 
         if (selectedTasks.length === 0) {
@@ -205,24 +214,22 @@
             return;
         }
 
-        // 1. Сохраняем в localStorage, чтобы функция отправки могла их взять
+        // Сохраняем всё в localStorage
         localStorage.setItem('booking_tasks', JSON.stringify(selectedTasks));
-        localStorage.setItem('booking_result', selectedResult);
+        localStorage.setItem('booking_time_prefs', JSON.stringify(selectedTimePrefs));
         localStorage.setItem('booking_comment', comment);
 
-        // 2. Вызываем функцию отправки
         sendDataToWebhook();
     }
 
-    // ФУНКЦИЯ ОТПРАВКИ
     async function sendDataToWebhook() {
         const user = tg.initDataUnsafe?.user || {};
         
         const bookingData = {
             engineer: localStorage.getItem('selectedEngineer'),
-            engineerPrice: localStorage.getItem('engineerPrice'), // поправил ключ (был temp_eng_price)
+            engineerPrice: localStorage.getItem('engineerPrice'), 
             services: JSON.parse(localStorage.getItem('booking_tasks') || '[]'),
-            resultType: localStorage.getItem('booking_result'),
+            timePreferences: JSON.parse(localStorage.getItem('booking_time_prefs') || '[]'), // Новое поле для n8n
             comment: localStorage.getItem('booking_comment'),
             username: user.username || 'n/a',
             first_name: user.first_name || 'n/a',
@@ -234,7 +241,6 @@
         };
 
         try {
-            // Показываем лоадер в кнопке или через интерфейс ТГ, чтобы юзер видел прогресс
             tg.MainButton.showProgress(); 
 
             const response = await fetch('https://n8ndex.ru/webhook-test/omni-send-brief', {
