@@ -231,12 +231,13 @@
     tg.expand();
 
     function selectEngineer(name, price) {
-        // Сохраняем имя и персональную ставку инженера
-        localStorage.setItem('selectedEngineer', name);
-        localStorage.setItem('engineerPrice', price);
+        // Используем ключи 'temp_eng_name', чтобы другой файл их увидел
+        localStorage.setItem('temp_eng_name', name);
+        localStorage.setItem('temp_eng_price', price);
         
-        // Переходим к выбору студии
-        location.href = 'engineer-details.html';
+        // Переходим на страницу деталей, а не на бронирование!
+        location.href = 'engineer-details.html'; 
+    }
     }
 </script>
 </body>
