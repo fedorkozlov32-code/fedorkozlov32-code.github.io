@@ -140,7 +140,7 @@
             <span class="icon">🎙️</span>
         </a>
 
-        <a href="#" class="menu-item secondary" onclick="handleService('price')">
+        <a href="price.html" class="menu-item secondary">
             <div class="item-info">
                 <span class="item-title">Прайс-лист</span>
                 <span class="item-desc">Цены на все услуги</span>
@@ -155,15 +155,6 @@
     tg.expand();
     tg.BackButton.hide(); // На главной кнопка "Назад" не нужна
 
-    function handleService(type) {
-        if (type === 'price') {
-            tg.showAlert("Прайс-лист временно обновляется. Актуальные цены уточняйте в чате.");
-        } else if (type === 'engineer') {
-            tg.showConfirm("Хотите забронировать сессию со звукорежиссером?", (ok) => {
-                if(ok) window.location.href = 'index.html?service=engineer';
-            });
-        }
-    }
 </script>
 
 </body>
