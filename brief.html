@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Бриф проекта</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --primary: #2F5CFF;
+            --bg: #ffffff;
+            --secondary-bg: #F2F5FF;
+            --text-main: #000000;
+            --text-gray: #8E8E93;
+            --border: #EFEFEF;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text-main);
+            padding: 30px 20px 120px 20px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1 { font-size: 34px; font-weight: 900; letter-spacing: -1.5px; margin-bottom: 8px; line-height: 1.1; }
+        .subtitle { font-size: 16px; color: var(--text-gray); margin-bottom: 40px; font-weight: 500; }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-gray);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        /* Сетка выбора (Этапы 1 и 2) */
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .option-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 20px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+
+        .option-card.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(47, 92, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Поле ввода (Этап 3) */
+        .comment-area {
+            width: 100%;
+            height: 160px;
+            background: var(--secondary-bg);
+            border: none;
+            border-radius: 24px;
+            padding: 20px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 500;
+            box-sizing: border-box;
+            resize: none;
+            outline: none;
+            transition: background 0.3s;
+        }
+
+        .comment-area:focus {
+            background: #EBEEF5;
+        }
+
+        /* Нижняя панель */
+        .footer {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .btn {
+            height: 64px;
+            border-radius: 20px;
+            border: none;
+            font-weight: 800;
+            font-size: 17px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-next {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-back {
+            width: 64px;
+            background: #F2F2F7;
+            color: black;
+        }
+
+        .btn:active { transform: scale(0.96); }
+
+        /* Специальный стиль для "Трек под ключ" */
+        #key-option {
+            grid-column: span 2;
+            background: #fdfdfd;
+            border-style: dashed;
+            border-width: 2px;
+        }
+        #key-option.active {
+            border-style: solid;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Детали проекта</h1>
+    <p class="subtitle">Помоги нам лучше подготовиться к сессии</p>
+
+    <span class="section-label">1. Тип работы</span>
+    <div class="options-grid" id="type-grid">
+        <div class="option-card task-type" data-value="Запись вокала" onclick="toggleTask(this)">Запись вокала</div>
+        <div class="option-card task-type" data-value="Сведение и мастеринг" onclick="toggleTask(this)">Сведение и мастеринг</div>
+        <div class="option-card task-type" data-value="Создание бита" onclick="toggleTask(this)">Создание бита</div>
+        <div class="option-card task-type" id="key-option" data-value="Трек под ключ" onclick="toggleFullProject(this)">Трек под ключ</div>
+    </div>
+
+    <span class="section-label">2. Желаемый результат</span>
+    <div class="options-grid">
+        <div class="option-card result-type" onclick="selectSingle(this)">Сингл</div>
+        <div class="option-card result-type" onclick="selectSingle(this)">EP</div>
+        <div class="option-card result-type" onclick="selectSingle(this)">Альбом</div>
+        <div class="option-card result-type" onclick="selectSingle(this)">Другое</div>
+    </div>
+
+    <span class="section-label">3. Комментарий</span>
+    <textarea class="comment-area" id="user-comment" placeholder="Опиши свою идею, референсы или пожелания..."></textarea>
+
+    <div class="footer">
+        <button class="btn btn-back" onclick="history.back()">‹</button>
+        <button class="btn btn-next" onclick="saveAndNext()">Продолжить</button>
+    </div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    // Логика мульти-выбора для задач
+    function toggleTask(el) {
+        el.classList.toggle('active');
+        checkFullProjectStatus();
+    }
+
+    // Логика автоматического включения "Трек под ключ"
+    function checkFullProjectStatus() {
+        const tasks = document.querySelectorAll('.task-type:not(#key-option)');
+        const keyOption = document.getElementById('key-option');
+        const activeTasks = document.querySelectorAll('.task-type.active:not(#key-option)');
+
+        if (activeTasks.length === 3) {
+            keyOption.classList.add('active');
+        } else {
+            keyOption.classList.remove('active');
+        }
+    }
+
+    // Клик по самому "Трек под ключ" (включает всё остальное)
+    function toggleFullProject(el) {
+        const tasks = document.querySelectorAll('.task-type:not(#key-option)');
+        const isNowActive = el.classList.toggle('active');
+        
+        tasks.forEach(t => {
+            if (isNowActive) t.classList.add('active');
+            else t.classList.remove('active');
+        });
+    }
+
+    // Одиночный выбор для результата (Сингл/EP и т.д.)
+    function selectSingle(el) {
+        document.querySelectorAll('.result-type').forEach(card => card.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    function saveAndNext() {
+        const selectedTasks = Array.from(document.querySelectorAll('.task-type.active')).map(t => t.dataset.value);
+        const selectedResult = document.querySelector('.result-type.active')?.innerText || 'Не выбрано';
+        const comment = document.getElementById('user-comment').value;
+
+        if (selectedTasks.length === 0) {
+            tg.showAlert("Выбери хотя бы один тип работы");
+            return;
+        }
+
+        // Сохраняем данные для админки
+        localStorage.setItem('booking_tasks', JSON.stringify(selectedTasks));
+        localStorage.setItem('booking_result', selectedResult);
+        localStorage.setItem('booking_comment', comment);
+
+        // Переходим к выбору даты/времени
+        window.location.href = 'booking.html';
+    }
+</script>
+</body>
+</html>
