@@ -25,181 +25,254 @@
             margin: 0;
             padding: 20px;
             color: var(--text-main);
+            display: flex;
+            justify-content: center;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .header { margin-bottom: 30px; padding: 0 10px; }
-        .header h1 { font-size: 32px; font-weight: 900; margin: 0; letter-spacing: -1px; }
-        .header p { color: var(--text-secondary); margin: 5px 0 0 0; font-size: 16px; font-weight: 500; }
+        .container { width: 100%; max-width: 450px; animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .eng-grid {
+        .header-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .back-btn {
+            font-weight: 700;
+            color: var(--primary-color);
+            background: var(--secondary-bg);
+            padding: 8px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+
+        h1 { font-size: 36px; font-weight: 900; line-height: 1.05; margin: 0 0 35px 0; letter-spacing: -1.8px; }
+
+        .engineers-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            width: 100%;
+            gap: 18px;
         }
 
         .eng-card {
-            background: var(--bg-color);
-            border-radius: 24px;
-            overflow: hidden;
+            background: #fff;
+            border-radius: 28px;
+            position: relative;
+            padding: 10px;
             box-shadow: var(--card-shadow);
-            transition: transform 0.2s ease;
+            border: 1px solid #F0F0F0;
             cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
         }
 
-        .eng-card:active { transform: scale(0.96); }
+        .eng-card:active { transform: scale(0.94); }
 
-        .img-container { position: relative; width: 100%; height: 180px; }
-        .eng-photo { width: 100%; height: 100%; object-fit: cover; }
-        
+        .img-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .eng-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
         .price-badge {
             position: absolute;
-            bottom: 12px;
-            right: 12px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 6px 12px;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            padding: 5px 10px;
             border-radius: 12px;
-            font-weight: 800;
             font-size: 13px;
-            color: var(--primary-color);
+            font-weight: 800;
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .eng-info { padding: 15px; }
-        .eng-name { font-weight: 800; font-size: 17px; margin: 0; }
-        .eng-nickname { font-weight: 600; font-size: 12px; color: var(--primary-color); text-transform: uppercase; margin: 2px 0 0 0; letter-spacing: 0.5px; }
+        .eng-info {
+            padding: 0 6px 8px 6px;
+        }
 
-        /* Стили для кнопки подбора */
-        .match-card {
-            grid-column: span 2; /* Растягиваем на две колонки */
+        .eng-name {
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .eng-nickname {
+            font-size: 11px;
+            color: var(--primary-color);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+            opacity: 0.8;
+        }
+
+        .featured-tag {
+            position: absolute;
+            top: 15px;
+            left: 15px;
             background: var(--accent-gradient);
-            border-radius: 24px;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        /* Кнопка подбора (на всю ширину, не синяя) */
+        .match-btn {
+            grid-column: span 2;
+            background: var(--secondary-bg);
+            border: 2px dashed #D0D7FF;
+            border-radius: 28px;
             padding: 25px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            color: white;
-            box-shadow: 0 15px 30px rgba(47, 92, 255, 0.3);
-            margin-top: 10px;
-            border: none;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            margin-top: 5px;
+            text-align: left;
         }
 
-        .match-card:active { transform: scale(0.98); }
+        .match-btn:active { transform: scale(0.97); background: #EEF2FF; }
 
-        .match-info h2 { font-size: 20px; font-weight: 800; margin: 0; line-height: 1.2; }
-        .match-info p { font-size: 14px; font-weight: 500; margin: 5px 0 0 0; opacity: 0.9; }
-        .match-icon { font-size: 32px; background: rgba(255,255,255,0.2); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 18px; }
-
+        .match-btn-text h2 { font-size: 19px; font-weight: 800; margin: 0; color: var(--text-main); letter-spacing: -0.5px; }
+        .match-btn-text p { font-size: 13px; font-weight: 600; margin: 4px 0 0 0; color: var(--text-secondary); }
+        .match-icon { font-size: 28px; filter: grayscale(1); opacity: 0.6; }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>Звукари</h1>
-    <p>Выбери своего мастера</p>
-</div>
-
-<div class="eng-grid">
-    <div class="eng-card" onclick="selectEngineer('Misha Omni', 5000)">
-        <div class="img-container">
-            <img src="img/eng_misha.jpg" alt="Misha" class="eng-photo">
-            <div class="price-badge">5000₽</div>
-        </div>
-        <div class="eng-info">
-            <p class="eng-name">Миша</p>
-            <p class="eng-nickname">OMNI</p>
+<div class="container">
+    <div class="header-nav">
+        <div class="back-btn" onclick="location.href='index.html'">
+            <span>‹</span> Назад
         </div>
     </div>
 
-    <div class="eng-card" onclick="selectEngineer('Vanya 1side', 3000)">
-        <div class="img-container">
-            <img src="img/eng_vanya.jpg" alt="Vanya" class="eng-photo">
-            <div class="price-badge">3000₽</div>
+    <h1>Твой звук в <br>надежных руках</h1>
+
+    <div class="engineers-grid">
+        <div class="eng-card" onclick="selectEngineer('Misha Omni', 3500)">
+            <div class="featured-tag">Pro</div>
+            <div class="img-container">
+                <img src="img/eng_misha.jpg" alt="Misha" class="eng-photo">
+                <div class="price-badge">3500₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Миша</p>
+                <p class="eng-nickname">OMNI</p>
+            </div>
         </div>
-        <div class="eng-info">
-            <p class="eng-name">Ваня</p>
-            <p class="eng-nickname">1SIDE</p>
+
+        <div class="eng-card" onclick="selectEngineer('Vanya 1side', 2500)">
+            <div class="img-container">
+                <img src="img/eng_vanya.jpg" alt="Vanya" class="eng-photo">
+                <div class="price-badge">2500₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Ваня</p>
+                <p class="eng-nickname">1SIDE</p>
+            </div>
+        </div>
+
+        <div class="eng-card" onclick="selectEngineer('Serega Slitee', 2000)">
+            <div class="img-container">
+                <img src="img/eng_serega.jpg" alt="Serega" class="eng-photo">
+                <div class="price-badge">2000₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Серега</p>
+                <p class="eng-nickname">SLITEE</p>
+            </div>
+        </div>
+
+        <div class="eng-card" onclick="selectEngineer('Matvey Maite', 2000)">
+            <div class="img-container">
+                <img src="img/eng_matvey.jpg" alt="Matvey" class="eng-photo">
+                <div class="price-badge">2000₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Матвей</p>
+                <p class="eng-nickname">MAITE</p>
+            </div>
+        </div>
+
+        <div class="eng-card" onclick="selectEngineer('Stepa Vivienne', 2500)">
+            <div class="img-container">
+                <img src="img/eng_stepa.jpg" alt="Stepa" class="eng-photo">
+                <div class="price-badge">2500₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Степа</p>
+                <p class="eng-nickname">VIVIENNE</p>
+            </div>
+        </div>
+
+        <div class="eng-card" onclick="selectEngineer('Vlad Sonic', 2000)">
+            <div class="img-container">
+                <img src="img/eng_vlad.jpg" alt="Vlad" class="eng-photo">
+                <div class="price-badge">2000₽</div>
+            </div>
+            <div class="eng-info">
+                <p class="eng-name">Влад</p>
+                <p class="eng-nickname">SONIC</p>
+            </div>
+        </div>
+
+        <div class="match-btn" onclick="autoMatch()">
+            <div class="match-btn-text">
+                <h2>Подобрать инженера</h2>
+                <p>под мой запрос автоматически</p>
+            </div>
+            <div class="match-icon">🪄</div>
         </div>
     </div>
-
-    <div class="eng-card" onclick="selectEngineer('Serega Slitee', 3000)">
-        <div class="img-container">
-            <img src="img/eng_serega.jpg" alt="Serega" class="eng-photo">
-            <div class="price-badge">3000₽</div>
-        </div>
-        <div class="eng-info">
-            <p class="eng-name">Серега</p>
-            <p class="eng-nickname">SLITEE</p>
-        </div>
-    </div>
-
-    <div class="eng-card" onclick="selectEngineer('Matvey Maite', 3000)">
-        <div class="img-container">
-            <img src="img/eng_matvey.jpg" alt="Matvey" class="eng-photo">
-            <div class="price-badge">3000₽</div>
-        </div>
-        <div class="eng-info">
-            <p class="eng-name">Матвей</p>
-            <p class="eng-nickname">MAITE</p>
-        </div>
-    </div>
-
-    <div class="eng-card" onclick="selectEngineer('Stepa Vivienne', 2500)">
-        <div class="img-container">
-            <img src="img/eng_stepa.jpg" alt="Stepa" class="eng-photo">
-            <div class="price-badge">2500₽</div>
-        </div>
-        <div class="eng-info">
-            <p class="eng-name">Степа</p>
-            <p class="eng-nickname">VIVIENNE</p>
-        </div>
-    </div>
-
-    <div class="eng-card" onclick="selectEngineer('Vlad Sonic', 2000)">
-        <div class="img-container">
-            <img src="img/eng_vlad.jpg" alt="Vlad" class="eng-photo">
-            <div class="price-badge">2000₽</div>
-        </div>
-        <div class="eng-info">
-            <p class="eng-name">Влад</p>
-            <p class="eng-nickname">SONIC</p>
-        </div>
-    </div>
-
-    <button class="match-card" onclick="selectAndBrief()">
-        <div class="match-info">
-            <h2>Подобрать инженера<br>под мой запрос</h2>
-            <p>Мы сами выберем лучшего спеца</p>
-        </div>
-        <div class="match-icon">🪄</div>
-    </button>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // Функция для выбора конкретного инженера
     function selectEngineer(name, price) {
         localStorage.setItem('temp_eng_name', name);
         localStorage.setItem('temp_eng_price', price);
-        window.location.href = 'engineer-details.html';
+        location.href = 'engineer-details.html';
     }
 
-    // Функция для кнопки "Подобрать"
-    function selectAndBrief() {
-        // Сохраняем "нужно подобрать" в те же переменные
+    function autoMatch() {
+        // Сохраняем метку подбора в те же переменные
         localStorage.setItem('selectedEngineer', 'нужно подобрать');
         localStorage.setItem('temp_eng_name', 'нужно подобрать');
-        localStorage.setItem('temp_eng_price', 'по запросу');
+        localStorage.setItem('temp_eng_price', 'По запросу');
         
-        // Ведём сразу на бриф
-        window.location.href = 'brief.html';
+        // Ведем сразу на бриф
+        location.href = 'brief.html';
     }
 </script>
-
 </body>
 </html>
