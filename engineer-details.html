@@ -76,39 +76,69 @@
 </div>
 
 <script>
-    // База данных описаний
     const data = {
         'Misha Omni': {
-            desc: 'Топовый инженер студии. Работал с крупными артистами, специализируется на агрессивном миксе и идеальном тюне. Сделает твой трек готовым к чартам.',
+            desc: 'Топовый инженер студии. Работал с крупными артистами, специализируется на агрессивном миксе и идеальном тюне.',
             exp: '6 лет',
             img: 'img/eng_misha.jpg'
         },
         'Vanya 1side': {
-            desc: 'Мастер атмосферного звучания. Если тебе нужен объемный реверб и мягкий вокал — тебе к Ване. Профессионал в жанрах Indie и Melodic Trap.',
+            desc: 'Мастер атмосферного звучания. Если тебе нужен объемный реверб и мягкий вокал — тебе к Ване.',
             exp: '4 года',
             img: 'img/eng_vanya.jpg'
+        },
+        'Serega Slitee': {
+            desc: 'Специалист по мощному низу и четкой динамике. Сделает так, чтобы бит "пробивал" колонки.',
+            exp: '3 года',
+            img: 'img/eng_serega.jpg'
+        },
+        'Matvey Maite': {
+            desc: 'Профи в работе с мелодичным хип-хопом. Тонкое чувство вкуса и идеальная работа с пространством.',
+            exp: '3 года',
+            img: 'img/eng_matvey.jpg'
+        },
+        'Stepa Vivienne': {
+            desc: 'Экспериментальный звук и нестандартные решения. Идеально для тех, кто ищет уникальное звучание.',
+            exp: '4 года',
+            img: 'img/eng_stepa.jpg'
+        },
+        'Vlad Sonic': {
+            desc: 'Скорость и качество. Влад выжмет максимум из твоей сессии записи за короткое время.',
+            exp: '3 года',
+            img: 'img/eng_vlad.jpg'
         }
-        // ... добавь остальных так же
     };
 
+    // Получаем данные
     const name = localStorage.getItem('temp_eng_name');
     const price = localStorage.getItem('temp_eng_price');
-    const engineer = data[name];
 
-    if (engineer) {
-        document.getElementById('eng-name').innerText = name.split(' ')[0];
-        document.getElementById('eng-nick').innerText = name.split(' ')[1];
+    console.log("Загрузка инженера:", name); // Для отладки
+
+    if (name && data[name]) {
+        const engineer = data[name];
+        
+        // Безопасное разделение имени и ника
+        const nameParts = name.split(' ');
+        document.getElementById('eng-name').innerText = nameParts[0] || '';
+        document.getElementById('eng-nick').innerText = nameParts[1] || '';
+        
         document.getElementById('eng-desc').innerText = engineer.desc;
-        document.getElementById('eng-price').innerText = price + '₽';
+        document.getElementById('eng-price').innerText = (price || '0') + ' ₽';
         document.getElementById('eng-exp').innerText = engineer.exp;
         document.getElementById('eng-pic').src = engineer.img;
+    } else {
+        console.error("Данные об инженере не найдены в localStorage или базе data");
+        // Можно добавить редирект назад, если данных нет
+        // location.href = 'engineers.html';
     }
 
     function confirmSelection() {
-        // Окончательно сохраняем и идем в студию
-        localStorage.setItem('selectedEngineer', name);
-        localStorage.setItem('engineerPrice', price);
-        location.href = 'studio.html';
+        if (name) {
+            localStorage.setItem('selectedEngineer', name);
+            localStorage.setItem('engineerPrice', price);
+            location.href = 'studio.html';
+        }
     }
 </script>
 </body>
