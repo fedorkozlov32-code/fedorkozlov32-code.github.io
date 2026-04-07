@@ -40,7 +40,6 @@
             display: block;
         }
 
-        /* Сетка выбора (Этапы 1 и 2) */
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -62,6 +61,7 @@
             align-items: center;
             justify-content: center;
             min-height: 60px;
+            user-select: none;
         }
 
         .option-card.active {
@@ -72,7 +72,6 @@
             transform: translateY(-2px);
         }
 
-        /* Поле ввода (Этап 3) */
         .comment-area {
             width: 100%;
             height: 160px;
@@ -86,14 +85,8 @@
             box-sizing: border-box;
             resize: none;
             outline: none;
-            transition: background 0.3s;
         }
 
-        .comment-area:focus {
-            background: #EBEEF5;
-        }
-
-        /* Нижняя панель */
         .footer {
             position: fixed;
             bottom: 0; left: 0; right: 0;
@@ -113,32 +106,20 @@
             font-weight: 800;
             font-size: 17px;
             cursor: pointer;
-            transition: all 0.2s ease;
         }
 
-        .btn-next {
-            flex: 1;
-            background: var(--primary);
-            color: white;
-        }
+        .btn-next { flex: 1; background: var(--primary); color: white; }
+        .btn-back { width: 64px; background: #F2F2F7; color: black; }
 
-        .btn-back {
-            width: 64px;
-            background: #F2F2F7;
-            color: black;
-        }
-
-        .btn:active { transform: scale(0.96); }
-
-        /* Специальный стиль для "Трек под ключ" */
+        /* Стиль для специальных кнопок */
         #key-option {
             grid-column: span 2;
-            background: #fdfdfd;
-            border-style: dashed;
-            border-width: 2px;
+            border: 2px dashed var(--border);
+            background: #fafafa;
         }
         #key-option.active {
-            border-style: solid;
+            border: 2px solid var(--primary);
+            background: var(--primary);
         }
     </style>
 </head>
@@ -152,7 +133,11 @@
         <div class="option-card task-type" data-value="Запись вокала" onclick="toggleTask(this)">Запись вокала</div>
         <div class="option-card task-type" data-value="Сведение и мастеринг" onclick="toggleTask(this)">Сведение и мастеринг</div>
         <div class="option-card task-type" data-value="Создание бита" onclick="toggleTask(this)">Создание бита</div>
-        <div class="option-card task-type" id="key-option" data-value="Трек под ключ" onclick="toggleFullProject(this)">Трек под ключ</div>
+        <div class="option-card" data-value="Обучение" onclick="this.classList.toggle('active')">Обучение</div>
+        
+        <div class="option-card task-type-full" id="key-option" data-value="Трек под ключ" onclick="toggleFullProject(this)">
+            <span>Трек под ключ</span>
+        </div>
     </div>
 
     <span class="section-label">2. Желаемый результат</span>
@@ -175,17 +160,17 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // Логика мульти-выбора для задач
+    // Переключение обычных задач (влияют на "Под ключ")
     function toggleTask(el) {
         el.classList.toggle('active');
         checkFullProjectStatus();
     }
 
-    // Логика автоматического включения "Трек под ключ"
+    // Авто-проверка: если выбраны все 3 основные задачи
     function checkFullProjectStatus() {
-        const tasks = document.querySelectorAll('.task-type:not(#key-option)');
+        const tasks = document.querySelectorAll('.task-type');
+        const activeTasks = document.querySelectorAll('.task-type.active');
         const keyOption = document.getElementById('key-option');
-        const activeTasks = document.querySelectorAll('.task-type.active:not(#key-option)');
 
         if (activeTasks.length === 3) {
             keyOption.classList.add('active');
@@ -194,10 +179,10 @@
         }
     }
 
-    // Клик по самому "Трек под ключ" (включает всё остальное)
+    // Клик по "Трек под ключ" — включает или выключает сразу три основные задачи
     function toggleFullProject(el) {
-        const tasks = document.querySelectorAll('.task-type:not(#key-option)');
         const isNowActive = el.classList.toggle('active');
+        const tasks = document.querySelectorAll('.task-type');
         
         tasks.forEach(t => {
             if (isNowActive) t.classList.add('active');
@@ -205,14 +190,16 @@
         });
     }
 
-    // Одиночный выбор для результата (Сингл/EP и т.д.)
     function selectSingle(el) {
         document.querySelectorAll('.result-type').forEach(card => card.classList.remove('active'));
         el.classList.add('active');
     }
 
     function saveAndNext() {
-        const selectedTasks = Array.from(document.querySelectorAll('.task-type.active')).map(t => t.dataset.value);
+        // Собираем все активные опции (включая обучение и под ключ)
+        const allActive = Array.from(document.querySelectorAll('.option-card.active, .task-type-full.active'));
+        const selectedTasks = allActive.map(t => t.getAttribute('data-value') || t.innerText);
+        
         const selectedResult = document.querySelector('.result-type.active')?.innerText || 'Не выбрано';
         const comment = document.getElementById('user-comment').value;
 
@@ -221,12 +208,10 @@
             return;
         }
 
-        // Сохраняем данные для админки
         localStorage.setItem('booking_tasks', JSON.stringify(selectedTasks));
         localStorage.setItem('booking_result', selectedResult);
         localStorage.setItem('booking_comment', comment);
 
-        // Переходим к выбору даты/времени
         window.location.href = 'booking.html';
     }
 </script>
